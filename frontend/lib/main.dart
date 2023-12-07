@@ -12,6 +12,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Flutter Demo',
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
@@ -33,10 +34,21 @@ class _BrowserState extends State<Browser> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(16),
           child: Container(
-        color: Colors.red,
-        height: 30,
-      )),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(8),
+              color: Colors.grey[100],
+            ),
+            height: 30,
+          ),
+        ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {},
+        child: const Icon(Icons.add),
+      ),
     );
   }
 }
