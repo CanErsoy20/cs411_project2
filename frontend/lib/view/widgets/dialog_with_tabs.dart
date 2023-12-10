@@ -1,4 +1,6 @@
+import 'package:cs411_project2/viewmodel/bookmarks_cubit/bookmarks_cubit.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class DialogWithTabs extends StatefulWidget {
   @override
@@ -40,51 +42,86 @@ class _DialogWithTabsState extends State<DialogWithTabs>
                   )
                 ]),
                 Expanded(
-                  child:
-                      TabBarView(controller: _tabController, children: const [
+                  child: TabBarView(controller: _tabController, children: [
                     Padding(
-                      padding: EdgeInsets.all(8.0),
+                      padding: const EdgeInsets.all(8.0),
                       child: Column(
                         children: [
-                          TextField(
-                            decoration: InputDecoration(
+                          TextFormField(
+                            decoration: const InputDecoration(
                               border: OutlineInputBorder(),
                               labelText: 'Bookmark Name',
                             ),
+                            controller: context
+                                .read<BookmarksCubit>()
+                                .addBookmarkNameController,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return "Bookmark name cannot be empty";
+                              }
+                              return null;
+                            },
                           ),
-                          SizedBox(height: 10),
-                          TextField(
-                            decoration: InputDecoration(
-                              border: OutlineInputBorder(),
-                              labelText: 'Bookmark URL',
-                            ),
-                          ),
-                          SizedBox(height: 10),
-                          TextField(
-                            decoration: InputDecoration(
-                              border: OutlineInputBorder(),
-                              labelText: 'Bookmark Label',
-                            ),
-                          ),
+                          const SizedBox(height: 10),
+                          TextFormField(
+                              decoration: const InputDecoration(
+                                border: OutlineInputBorder(),
+                                labelText: 'Bookmark URL',
+                              ),
+                              controller: context
+                                  .read<BookmarksCubit>()
+                                  .addBookmarkURLController,
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return "Bookmark URL cannot be empty";
+                                }
+                                return null;
+                              }),
+                          const SizedBox(height: 10),
+                          TextFormField(
+                              decoration: const InputDecoration(
+                                border: OutlineInputBorder(),
+                                labelText: 'Bookmark Label',
+                              ),
+                              controller: context
+                                  .read<BookmarksCubit>()
+                                  .addBookmarkLabelController,
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return "Bookmark label cannot be empty";
+                                }
+                                return null;
+                              }),
                         ],
                       ),
                     ),
                     Padding(
-                      padding: EdgeInsets.all(8.0),
+                      padding: const EdgeInsets.all(8.0),
                       child: Column(
                         children: [
-                          TextField(
-                            decoration: InputDecoration(
-                              border: OutlineInputBorder(),
-                              labelText: 'Folder Name',
-                            ),
-                          ),
-                          SizedBox(height: 10),
-                          TextField(
-                            decoration: InputDecoration(
+                          TextFormField(
+                              decoration: const InputDecoration(
+                                border: OutlineInputBorder(),
+                                labelText: 'Folder Name',
+                              ),
+                              controller: context
+                                  .read<BookmarksCubit>()
+                                  .addFolderNameController,
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return "Folder name cannot be empty";
+                                }
+                                return null;
+                              }),
+                          const SizedBox(height: 10),
+                          TextFormField(
+                            decoration: const InputDecoration(
                               border: OutlineInputBorder(),
                               labelText: 'Folder Label',
                             ),
+                            controller: context
+                                .read<BookmarksCubit>()
+                                .addFolderLabelController,
                           ),
                         ],
                       ),

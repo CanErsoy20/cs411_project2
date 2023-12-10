@@ -1,5 +1,7 @@
 import 'package:cs411_project2/model/bookmark_model.dart';
+import 'package:cs411_project2/viewmodel/bookmarks_cubit/bookmarks_cubit.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class BookmarkWidget extends StatelessWidget {
   const BookmarkWidget({super.key, required this.bookmark});
@@ -31,6 +33,9 @@ class BookmarkWidget extends StatelessWidget {
                             ),
                             TextButton(
                               onPressed: () {
+                                context
+                                    .read<BookmarksCubit>()
+                                    .deleteBookmark(bookmark.bookmarkId!);
                                 Navigator.pop(context);
                               },
                               child: const Text("Yes, delete please",

@@ -49,12 +49,13 @@ class _BrowserScreenState extends State<BrowserScreen> {
                           borderRadius: BorderRadius.circular(8),
                           color: Colors.grey[100],
                         ),
-                        height: 30,
+                        height: 50,
                         child: const Padding(
                           padding: EdgeInsets.all(8.0),
                           child: TextField(
                             decoration: InputDecoration(
                               border: InputBorder.none,
+                              hintText: "Type a URL",
                             ),
                           ),
                         ),
@@ -82,13 +83,13 @@ class _BrowserScreenState extends State<BrowserScreen> {
                       scrollDirection: Axis.horizontal,
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
-                        children: context
-                            .read<BookmarksCubit>()
-                            .myBookmarks
-                            .map((bookmark) {
+                        children:
+                            context.read<BookmarksCubit>().temp.map((bookmark) {
                           return FolderWidget(
-                              bookmarks:
-                                  context.read<BookmarksCubit>().myBookmarks);
+                            bookmarks:
+                                context.read<BookmarksCubit>().myBookmarks,
+                            folderName: bookmark.name!,
+                          );
                         }).toList(),
                       ),
                     ),
@@ -108,14 +109,28 @@ class _BrowserScreenState extends State<BrowserScreen> {
                                 }),
                           ),
                         ),
-                        const SizedBox(
+                        SizedBox(
                           width: 200,
                           height: 35,
                           child: TextField(
+                            controller: context
+                                .read<BookmarksCubit>()
+                                .searchBookmarkController,
                             decoration: InputDecoration(
                               border: OutlineInputBorder(),
                               labelText: "Search Bookmarks",
+                              suffixIcon: IconButton(
+                                icon: Icon(Icons.clear),
+                                onPressed: () {
+                                  context.read<BookmarksCubit>().clearSearch();
+                                },
+                              ),
                             ),
+                            onChanged: (value) {
+                              context
+                                  .read<BookmarksCubit>()
+                                  .searchBookmark(value);
+                            },
                           ),
                         ),
                         Padding(

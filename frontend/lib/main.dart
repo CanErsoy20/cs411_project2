@@ -1,4 +1,5 @@
 import 'package:cs411_project2/services/auth_service.dart';
+import 'package:cs411_project2/services/bookmark_service.dart';
 import 'package:cs411_project2/view/screens/browser_screen.dart';
 import 'package:cs411_project2/viewmodel/auth_cubit/auth_cubit.dart';
 import 'package:flutter/material.dart';
@@ -20,12 +21,13 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   AuthService authService = AuthService();
+  BookmarkService bookmarkService = BookmarkService();
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
         BlocProvider(
-          create: (context) => BookmarksCubit(),
+          create: (context) => BookmarksCubit(bookmarkService),
         ),
         BlocProvider(
           create: (context) => AuthCubit(authService),

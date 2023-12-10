@@ -1,10 +1,15 @@
 import 'package:cs411_project2/model/bookmark_model.dart';
 import 'package:cs411_project2/view/widgets/bookmark_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
+import '../../viewmodel/bookmarks_cubit/bookmarks_cubit.dart';
 
 class FolderWidget extends StatelessWidget {
-  const FolderWidget({super.key, required this.bookmarks});
+  const FolderWidget(
+      {super.key, required this.bookmarks, required this.folderName});
   final List<Bookmark> bookmarks;
+  final String folderName;
   @override
   Widget build(BuildContext context) {
     List<PopupMenuItem> items = bookmarks
@@ -79,7 +84,7 @@ class FolderWidget extends StatelessWidget {
                   builder: (context) {
                     return AlertDialog(
                       title: Text(
-                          "Are you sure you want to delete bookmark \"${bookmarks[0].name}\"?"),
+                          "Are you sure you want to delete folder \"${folderName}\"?"),
                       actions: [
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -93,6 +98,7 @@ class FolderWidget extends StatelessWidget {
                             ),
                             TextButton(
                               onPressed: () {
+                                context.read<BookmarksCubit>().deleteFolder(0);
                                 Navigator.pop(context);
                               },
                               child: const Text("Yes, delete please",
@@ -125,7 +131,7 @@ class FolderWidget extends StatelessWidget {
                 color: Colors.grey,
               ),
               const SizedBox(width: 5),
-              Text(bookmarks[0].name ?? "Error"),
+              Text(folderName ?? "Error"),
             ],
           ),
         ),
