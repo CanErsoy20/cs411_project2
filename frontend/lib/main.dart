@@ -1,53 +1,44 @@
+import 'package:cs411_project2/services/auth_service.dart';
+import 'package:cs411_project2/view/screens/browser_screen.dart';
+import 'package:cs411_project2/viewmodel/auth_cubit/auth_cubit.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
+import 'viewmodel/bookmarks_cubit/bookmarks_cubit.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(const MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
-      ),
-      home: Browser(),
-    );
-  }
+  State<MyApp> createState() => _MyAppState();
 }
 
-class Browser extends StatefulWidget {
-  const Browser({super.key});
-
-  @override
-  State<Browser> createState() => _BrowserState();
-}
-
-class _BrowserState extends State<Browser> {
+class _MyAppState extends State<MyApp> {
+  AuthService authService = AuthService();
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(8),
-              color: Colors.grey[100],
-            ),
-            height: 30,
-          ),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(
+          create: (context) => BookmarksCubit(),
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {},
-        child: const Icon(Icons.add),
+        BlocProvider(
+          create: (context) => AuthCubit(authService),
+        ),
+      ],
+      child: MaterialApp(
+        title: 'Flutter Demo',
+        debugShowCheckedModeBanner: false,
+        theme: ThemeData(
+          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+          useMaterial3: true,
+        ),
+        home: const BrowserScreen(),
       ),
     );
   }
