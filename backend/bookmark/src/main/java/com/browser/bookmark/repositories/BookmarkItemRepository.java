@@ -11,4 +11,6 @@ import java.util.List;
 public interface BookmarkItemRepository extends JpaRepository<BookmarkItem, Long> {
     @Query("SELECT i FROM BookmarkItem i WHERE i.label=?1")
     List<BookmarkItem> findBookmarkItemsByLabel(String label);
+    @Query("SELECT DISTINCT b.label FROM BookmarkItem b WHERE b.label IS NOT NULL")
+    List<String> findLabels();
 }

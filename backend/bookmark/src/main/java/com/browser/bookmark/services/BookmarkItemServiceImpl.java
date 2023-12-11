@@ -49,4 +49,9 @@ public class BookmarkItemServiceImpl implements BookmarkItemService {
     public List<BookmarkItem> findBookmarkItemsByLabel(String label) {
         return bookmarkItemRepository.findBookmarkItemsByLabel(label);
     }
+
+    @Override
+    public List<String> findLabels() {
+        return bookmarkItemRepository.findLabels();
+    }
 }

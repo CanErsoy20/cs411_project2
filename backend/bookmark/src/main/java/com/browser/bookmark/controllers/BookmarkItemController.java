@@ -76,4 +76,16 @@ public class BookmarkItemController {
             return new Response("Exception", 500, null);
         }
     }
+
+    @CrossOrigin(origins = "*")
+    @GetMapping("/labels")
+    public Response getLabels() {
+        try {
+            List<String> labels = bookmarkItemService.findLabels();
+            return new Response("Success", 200, labels);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new Response("Exception", 500, null);
+        }
+    }
 }
