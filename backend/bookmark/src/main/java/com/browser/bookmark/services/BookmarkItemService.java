@@ -13,4 +13,5 @@ public interface BookmarkItemService {
     BookmarkItem findBookmarkItemById(Long id);
     void deleteBookmarkItemById(Long id);
     List<BookmarkItem> findBookmarkItemsByLabel(String label);
+    List<String> findLabels(Long id);
 }
