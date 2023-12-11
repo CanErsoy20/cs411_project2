@@ -1,15 +1,38 @@
 import 'dart:convert';
 
 import 'package:cs411_project2/model/assing_bookmark_model.dart';
+import 'package:cs411_project2/model/bookmark_item_model.dart';
 import 'package:cs411_project2/model/new_bookmark_model.dart';
 import 'package:cs411_project2/model/new_folder_model.dart';
 import 'package:cs411_project2/model/response_model.dart';
+import 'package:cs411_project2/model/user/user_info.dart';
 import 'package:cs411_project2/services/api.dart';
 import 'package:http/http.dart';
 
 import '../constants/api_constants.dart';
 
 class BookmarkService {
+  Future<List<BookmarkItemModel>?> getMyBookmarks() async {
+    try {
+      Response? response;
+      response = await Api.instance.getRequest(ApiConstants.baseUrl,
+          "${ApiConstants.getUserItems}${UserInfo.loggedUser!.userId!}");
+      if (response.statusCode == 200) {
+        dynamic body = json.decode(response.body);
+        ResponseModel responseModel = ResponseModel.fromJson(body);
+        List<BookmarkItemModel> bookmarkItemModelList = [];
+        responseModel.data.forEach((element) {
+          bookmarkItemModelList.add(BookmarkItemModel.fromJson(element));
+        });
+        return bookmarkItemModelList;
+      } else {
+        return null;
+      }
+    } catch (e) {
+      return null;
+    }
+  }
+
   Future<NewBookmarkModel?> addBookmark(
       NewBookmarkModel newBookmarkModel) async {
     try {

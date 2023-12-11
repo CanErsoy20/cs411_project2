@@ -1,4 +1,5 @@
 import 'package:bloc/bloc.dart';
+import 'package:cs411_project2/model/user/user_info.dart';
 import 'package:flutter/material.dart';
 
 import '../../model/auth/login_model.dart';
@@ -41,5 +42,13 @@ class AuthCubit extends Cubit<AuthState> {
       emit(AuthError(
           "Registration Failed", "Something went wrong, please try again"));
     }
+  }
+
+  void logout() {
+    UserInfo.loggedUser = null;
+    loginEmailController.clear();
+    loginPasswordController.clear();
+    registerEmailController.clear();
+    registerPasswordController.clear();
   }
 }

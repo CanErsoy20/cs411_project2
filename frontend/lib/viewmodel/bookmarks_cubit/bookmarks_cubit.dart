@@ -1,10 +1,12 @@
 import 'package:bloc/bloc.dart';
 import 'package:cs411_project2/model/assing_bookmark_model.dart';
+import 'package:cs411_project2/model/bookmark_item_model.dart';
 import 'package:cs411_project2/model/new_bookmark_model.dart';
 import 'package:cs411_project2/model/new_folder_model.dart';
 import 'package:cs411_project2/model/user/user_info.dart';
 import 'package:cs411_project2/services/bookmark_service.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart';
 
 import '../../model/bookmark_model.dart';
 import '../../model/filter_model.dart';
@@ -27,24 +29,8 @@ class BookmarksCubit extends Cubit<BookmarksState> {
   TextEditingController assignBookmarkURLController = TextEditingController();
   TextEditingController assignBookmarkLabelController = TextEditingController();
 
-  List<Bookmark> myBookmarks = [
-    Bookmark(
-        name: "Facebook", url: "https://facebook.com", label: "Social Media"),
-    Bookmark(name: "Research", url: "https://google.com", label: "Research"),
-    Bookmark(
-        name: "Youtube", url: "https://youtube.com", label: "Social Media"),
-    Bookmark(
-        name: "Twitter", url: "https://twitter.com", label: "Social Media"),
-  ];
-  List<Bookmark> temp = [
-    Bookmark(
-        name: "Facebook", url: "https://facebook.com", label: "Social Media"),
-    Bookmark(name: "Research", url: "https://google.com", label: "Research"),
-    Bookmark(
-        name: "Youtube", url: "https://youtube.com", label: "Social Media"),
-    Bookmark(
-        name: "Twitter", url: "https://twitter.com", label: "Social Media"),
-  ];
+  List<BookmarkItemModel> myBookmarkItems = [];
+  List<BookmarkItemModel> temp = [];
   List<PopupMenuItem> filters = [];
   List<Filter> filterList = [
     Filter("Social Media", false),
@@ -54,6 +40,19 @@ class BookmarksCubit extends Cubit<BookmarksState> {
   ];
 
   // Bookmark Methods
+  Future<void> getMyBookmarks() async {
+    emit(BookmarksLoading());
+    final response = await service.getMyBookmarks();
+    if (response == null) {
+      emit(BookmarksError(
+          title: "Error", description: "Could not get bookmarks"));
+    } else {
+      myBookmarkItems = response;
+      temp = myBookmarkItems;
+      emit(BookmarksDisplay());
+    }
+  }
+
   Future<void> addBookmark() async {
     emit(BookmarksLoading());
     NewBookmarkModel newModel = NewBookmarkModel(
@@ -70,6 +69,7 @@ class BookmarksCubit extends Cubit<BookmarksState> {
       emit(BookmarksSuccess(
           title: "Bookmark Added Successfully",
           description: "${newModel.name} added successfully"));
+      getMyBookmarks();
     }
   }
 
@@ -88,6 +88,7 @@ class BookmarksCubit extends Cubit<BookmarksState> {
       emit(BookmarksSuccess(
           title: "Folder Added Successfully",
           description: " ${newFolderModel.name} added successfully"));
+      getMyBookmarks();
     }
   }
 
@@ -103,6 +104,7 @@ class BookmarksCubit extends Cubit<BookmarksState> {
       emit(BookmarksError(title: "Error", description: ""));
     } else {
       emit(BookmarksSuccess(title: "Success", description: ""));
+      getMyBookmarks();
     }
   }
 
@@ -113,6 +115,7 @@ class BookmarksCubit extends Cubit<BookmarksState> {
       emit(BookmarksError(title: "Error", description: ""));
     } else {
       emit(BookmarksSuccess(title: "Success", description: ""));
+      getMyBookmarks();
     }
   }
 
@@ -123,6 +126,7 @@ class BookmarksCubit extends Cubit<BookmarksState> {
       emit(BookmarksError(title: "Error", description: ""));
     } else {
       emit(BookmarksSuccess(title: "Success", description: ""));
+      getMyBookmarks();
     }
   }
 
@@ -142,43 +146,43 @@ class BookmarksCubit extends Cubit<BookmarksState> {
   // Search and Filter methods
   void searchBookmark(String query) {
     if (query.isNotEmpty) {
-      temp = myBookmarks
+      temp = myBookmarkItems
           .where((element) =>
               element.name!.toLowerCase().contains(query.toLowerCase()))
           .toList();
 
       emit(BookmarksDisplay());
     } else {
-      temp = myBookmarks;
+      temp = myBookmarkItems;
       emit(BookmarksDisplay());
     }
   }
 
   void setFilters() {
-    filters = filterList
-        .map(
-          (filter) => PopupMenuItem(
-              value: filter.title,
-              child: CheckboxListTile(
-                  controlAffinity: ListTileControlAffinity.leading,
-                  title: Text(filter.title!),
-                  value: filter.value,
-                  onChanged: (value) {
-                    changeFilter(filter.title!, value ?? false);
-                  })),
-        )
-        .toList();
+    // filters = filterList
+    //     .map(
+    //       (filter) => PopupMenuItem(
+    //           value: filter.title,
+    //           child: CheckboxListTile(
+    //               controlAffinity: ListTileControlAffinity.leading,
+    //               title: Text(filter.title!),
+    //               value: filter.value,
+    //               onChanged: (value) {
+    //                 changeFilter(filter.title!, value ?? false);
+    //               })),
+    //     )
+    //     .toList();
   }
 
   void changeFilter(String title, bool value) {
-    filterList.firstWhere((element) => element.title == title).value = value;
-    setFilters();
-    emit(BookmarksDisplay());
+    // filterList.firstWhere((element) => element.title == title).value = value;
+    // setFilters();
+    // emit(BookmarksDisplay());
   }
 
   void clearSearch() {
     searchBookmarkController.clear();
-    temp = myBookmarks;
+    temp = myBookmarkItems;
     emit(BookmarksDisplay());
   }
 
