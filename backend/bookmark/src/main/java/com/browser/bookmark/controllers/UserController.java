@@ -82,6 +82,20 @@ public class UserController {
     }
 
     @CrossOrigin(origins = "*")
+    @GetMapping("/get-items/{id}")
+    public Response getUserItems(@PathVariable("id") long id) {
+        try {
+            User foundUser = userService.findUserById(id);
+            if(foundUser == null)
+                return new Response("User does not exist.", 200, null);
+            return new Response("Success", 200, foundUser.getItems());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new Response("Exception", 500, null);
+        }
+    }
+
+    @CrossOrigin(origins = "*")
     @GetMapping
     public Response getUserByEmail(@RequestParam("email") String email) {
         try {
