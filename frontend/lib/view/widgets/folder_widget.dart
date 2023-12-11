@@ -1,3 +1,4 @@
+import 'package:cs411_project2/model/bookmark_item_model.dart';
 import 'package:cs411_project2/model/bookmark_model.dart';
 import 'package:cs411_project2/view/widgets/bookmark_widget.dart';
 import 'package:flutter/material.dart';
@@ -6,17 +7,37 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../viewmodel/bookmarks_cubit/bookmarks_cubit.dart';
 
 class FolderWidget extends StatelessWidget {
-  const FolderWidget(
-      {super.key, required this.bookmarks, required this.folderName});
-  final List<Bookmark> bookmarks;
+  FolderWidget(
+      {super.key,
+      required this.bookmarks,
+      required this.folderName,
+      required this.folderId});
+  final List<BookmarkItemModel> bookmarks;
+  final GlobalKey<FormState> assignBookmarkFormKey = GlobalKey<FormState>();
   final String folderName;
+  final int folderId;
   @override
   Widget build(BuildContext context) {
     List<PopupMenuItem> items = bookmarks
         .map((bookmark) => PopupMenuItem(
-              child: BookmarkWidget(bookmark: bookmark),
+              child: (bookmark.type! == "F")
+                  ? FolderWidget(
+                      bookmarks: bookmark.items ?? [],
+                      folderName: bookmark.name!,
+                      folderId: bookmark.id!,
+                    )
+                  : BookmarkWidget(
+                      bookmark: Bookmark(
+                          bookmarkId: bookmark.id,
+                          label: bookmark.label,
+                          name: bookmark.name,
+                          url: bookmark.url)),
             ))
         .toList();
+    if (items.isEmpty) {
+      items.add(const PopupMenuItem(child: Text("No Bookmark in this Folder")));
+    }
+
     items.add(
       PopupMenuItem(
           value: 3,
@@ -29,30 +50,59 @@ class FolderWidget extends StatelessWidget {
                   builder: (context) {
                     return AlertDialog(
                       title: const Text("Add New Bookmark"),
-                      content: const Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          TextField(
-                            decoration: InputDecoration(
-                              border: OutlineInputBorder(),
-                              labelText: 'Bookmark Name',
-                            ),
+                      content: Form(
+                        key: assignBookmarkFormKey,
+                        child: SingleChildScrollView(
+                          child: Column(
+                            children: [
+                              TextFormField(
+                                decoration: const InputDecoration(
+                                  border: OutlineInputBorder(),
+                                  labelText: 'Bookmark Name',
+                                ),
+                                controller: context
+                                    .read<BookmarksCubit>()
+                                    .assignBookmarkNameController,
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return "Bookmark name cannot be empty";
+                                  }
+                                  return null;
+                                },
+                              ),
+                              const SizedBox(height: 10),
+                              TextFormField(
+                                  decoration: const InputDecoration(
+                                    border: OutlineInputBorder(),
+                                    labelText: 'Bookmark URL',
+                                  ),
+                                  controller: context
+                                      .read<BookmarksCubit>()
+                                      .assignBookmarkURLController,
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return "Bookmark URL cannot be empty";
+                                    }
+                                    return null;
+                                  }),
+                              const SizedBox(height: 10),
+                              TextFormField(
+                                  decoration: const InputDecoration(
+                                    border: OutlineInputBorder(),
+                                    labelText: 'Bookmark Label',
+                                  ),
+                                  controller: context
+                                      .read<BookmarksCubit>()
+                                      .assignBookmarkLabelController,
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return "Bookmark label cannot be empty";
+                                    }
+                                    return null;
+                                  }),
+                            ],
                           ),
-                          SizedBox(height: 10),
-                          TextField(
-                            decoration: InputDecoration(
-                              border: OutlineInputBorder(),
-                              labelText: 'Bookmark URL',
-                            ),
-                          ),
-                          SizedBox(height: 10),
-                          TextField(
-                            decoration: InputDecoration(
-                              border: OutlineInputBorder(),
-                              labelText: 'Bookmark Label',
-                            ),
-                          ),
-                        ],
+                        ),
                       ),
                       actions: [
                         Row(
@@ -65,7 +115,14 @@ class FolderWidget extends StatelessWidget {
                               child: const Text("Cancel"),
                             ),
                             TextButton(
-                              onPressed: () {},
+                              onPressed: () {
+                                if (assignBookmarkFormKey.currentState!
+                                    .validate()) {
+                                  context
+                                      .read<BookmarksCubit>()
+                                      .assignBookmark(folderId);
+                                }
+                              },
                               child: const Text("Add"),
                             ),
                           ],
@@ -84,7 +141,7 @@ class FolderWidget extends StatelessWidget {
                   builder: (context) {
                     return AlertDialog(
                       title: Text(
-                          "Are you sure you want to delete folder \"${folderName}\"?"),
+                          "Are you sure you want to delete folder \"$folderName\"?"),
                       actions: [
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -98,7 +155,9 @@ class FolderWidget extends StatelessWidget {
                             ),
                             TextButton(
                               onPressed: () {
-                                context.read<BookmarksCubit>().deleteFolder(0);
+                                context
+                                    .read<BookmarksCubit>()
+                                    .deleteFolder(folderId);
                                 Navigator.pop(context);
                               },
                               child: const Text("Yes, delete please",

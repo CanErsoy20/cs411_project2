@@ -36,7 +36,6 @@ class BookmarkWidget extends StatelessWidget {
                                 context
                                     .read<BookmarksCubit>()
                                     .deleteBookmark(bookmark.bookmarkId!);
-                                Navigator.pop(context);
                               },
                               child: const Text("Yes, delete please",
                                   style: TextStyle(color: Colors.green)),

@@ -1,3 +1,5 @@
+import 'package:cs411_project2/model/bookmark_model.dart';
+import 'package:cs411_project2/view/widgets/custom_snackbars.dart';
 import 'package:cs411_project2/view/widgets/dialog_with_tabs.dart';
 import 'package:cs411_project2/view/widgets/bookmark_widget.dart';
 import 'package:cs411_project2/view/widgets/folder_widget.dart';
@@ -15,7 +17,8 @@ class BrowserScreen extends StatefulWidget {
   State<BrowserScreen> createState() => _BrowserScreenState();
 }
 
-class _BrowserScreenState extends State<BrowserScreen> {
+class _BrowserScreenState extends State<BrowserScreen>
+    with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
@@ -23,11 +26,31 @@ class _BrowserScreenState extends State<BrowserScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final loginFormKey = GlobalKey<FormState>();
-    final registerFormKey = GlobalKey<FormState>();
+    final GlobalKey<FormState> loginFormKey = GlobalKey<FormState>();
+    final GlobalKey<FormState> registerFormKey = GlobalKey<FormState>();
+    final GlobalKey<FormState> addBookmarkFormKey = GlobalKey<FormState>();
+    final GlobalKey<FormState> addFolderFormKey = GlobalKey<FormState>();
+    TabController addTabController = TabController(length: 2, vsync: this);
+    TabController authTabController = TabController(length: 2, vsync: this);
     return BlocConsumer<BookmarksCubit, BookmarksState>(
       bloc: context.read<BookmarksCubit>()..setFilters(),
-      listener: (context, state) {},
+      listener: (context, state) {
+        if (state is BookmarksSuccess) {
+          CustomSnackbars.displaySuccessMotionToast(
+              context, state.title, state.description, () {
+            context.read<BookmarksCubit>().clearForms();
+            context.read<BookmarksCubit>().refresh();
+            Navigator.pop(context);
+          });
+        } else if (state is BookmarksError) {
+          CustomSnackbars.displayErrorMotionToast(
+              context, state.title, state.description, () {
+            context.read<BookmarksCubit>().clearForms();
+            context.read<BookmarksCubit>().refresh();
+            Navigator.pop(context);
+          });
+        }
+      },
       builder: (context, state) {
         return Scaffold(
           appBar: AppBar(
@@ -62,14 +85,218 @@ class _BrowserScreenState extends State<BrowserScreen> {
                       ),
                     ),
                     BlocConsumer<AuthCubit, AuthState>(
-                      listener: (context, state) {},
+                      listener: (context, state) {
+                        if (state is AuthSuccess) {
+                          CustomSnackbars.displaySuccessMotionToast(
+                              context, state.title, state.description, () {
+                            context.read<BookmarksCubit>().refresh();
+                            Navigator.pop(context);
+                          });
+                        } else if (state is AuthError) {
+                          CustomSnackbars.displayErrorMotionToast(
+                              context, state.title, state.description, () {
+                            Navigator.pop(context);
+                          });
+                        }
+                      },
                       builder: (context, state) {
                         return IconButton(
                             onPressed: () {
-                              UserInfo.loggedUser != null
-                                  ? _buildLoginDialog(context, loginFormKey)
-                                  : _buildRegisterDialog(
-                                      context, registerFormKey);
+                              showDialog(
+                                  context: context,
+                                  builder: (context) {
+                                    return Dialog(
+                                      child: SingleChildScrollView(
+                                        child: SizedBox(
+                                          width: 400,
+                                          height: 300,
+                                          child: Padding(
+                                            padding: const EdgeInsets.all(8.0),
+                                            child: Column(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                TabBar(
+                                                    controller:
+                                                        authTabController,
+                                                    tabs: [
+                                                      Tab(
+                                                        text: "Login",
+                                                      ),
+                                                      Tab(
+                                                        text: "Register",
+                                                      )
+                                                    ]),
+                                                Expanded(
+                                                  child: TabBarView(
+                                                      controller:
+                                                          authTabController,
+                                                      children: [
+                                                        Form(
+                                                          key: loginFormKey,
+                                                          child: Padding(
+                                                            padding:
+                                                                const EdgeInsets
+                                                                    .all(8.0),
+                                                            child: Column(
+                                                              mainAxisSize:
+                                                                  MainAxisSize
+                                                                      .min,
+                                                              children: [
+                                                                TextFormField(
+                                                                  decoration:
+                                                                      const InputDecoration(
+                                                                    border:
+                                                                        OutlineInputBorder(),
+                                                                    labelText:
+                                                                        'Email',
+                                                                  ),
+                                                                  controller: context
+                                                                      .read<
+                                                                          AuthCubit>()
+                                                                      .loginEmailController,
+                                                                  validator:
+                                                                      (value) {
+                                                                    if (value ==
+                                                                            null ||
+                                                                        value
+                                                                            .isEmpty) {
+                                                                      return 'Email cannot be empty';
+                                                                    }
+                                                                    return null;
+                                                                  },
+                                                                ),
+                                                                const SizedBox(
+                                                                    height: 10),
+                                                                TextFormField(
+                                                                    decoration:
+                                                                        const InputDecoration(
+                                                                      border:
+                                                                          OutlineInputBorder(),
+                                                                      labelText:
+                                                                          'Password',
+                                                                    ),
+                                                                    controller: context
+                                                                        .read<
+                                                                            AuthCubit>()
+                                                                        .loginPasswordController,
+                                                                    validator:
+                                                                        (value) {
+                                                                      if (value ==
+                                                                              null ||
+                                                                          value
+                                                                              .isEmpty) {
+                                                                        return 'Password cannot be empty';
+                                                                      }
+                                                                      return null;
+                                                                    }),
+                                                              ],
+                                                            ),
+                                                          ),
+                                                        ),
+                                                        Form(
+                                                          key: registerFormKey,
+                                                          child: Column(
+                                                            mainAxisSize:
+                                                                MainAxisSize
+                                                                    .min,
+                                                            children: [
+                                                              TextFormField(
+                                                                decoration:
+                                                                    const InputDecoration(
+                                                                  border:
+                                                                      OutlineInputBorder(),
+                                                                  labelText:
+                                                                      'Email',
+                                                                ),
+                                                                controller: context
+                                                                    .read<
+                                                                        AuthCubit>()
+                                                                    .registerEmailController,
+                                                                validator:
+                                                                    (value) {
+                                                                  if (value ==
+                                                                          null ||
+                                                                      value
+                                                                          .isEmpty) {
+                                                                    return 'Email cannot be empty';
+                                                                  }
+                                                                  return null;
+                                                                },
+                                                              ),
+                                                              const SizedBox(
+                                                                  height: 10),
+                                                              TextFormField(
+                                                                  decoration:
+                                                                      const InputDecoration(
+                                                                    border:
+                                                                        OutlineInputBorder(),
+                                                                    labelText:
+                                                                        'Password',
+                                                                  ),
+                                                                  controller: context
+                                                                      .read<
+                                                                          AuthCubit>()
+                                                                      .registerPasswordController,
+                                                                  validator:
+                                                                      (value) {
+                                                                    if (value ==
+                                                                            null ||
+                                                                        value
+                                                                            .isEmpty) {
+                                                                      return 'Password cannot be empty';
+                                                                    }
+                                                                    return null;
+                                                                  }),
+                                                            ],
+                                                          ),
+                                                        ),
+                                                      ]),
+                                                ),
+                                                Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.end,
+                                                  children: [
+                                                    TextButton(
+                                                        onPressed: () {
+                                                          Navigator.pop(
+                                                              context);
+                                                        },
+                                                        child: const Text(
+                                                            "Cancel")),
+                                                    TextButton(
+                                                        onPressed: () {
+                                                          if (authTabController
+                                                                      .index ==
+                                                                  0 &&
+                                                              loginFormKey
+                                                                  .currentState!
+                                                                  .validate()) {
+                                                            context
+                                                                .read<
+                                                                    AuthCubit>()
+                                                                .login();
+                                                          } else if (authTabController
+                                                                      .index ==
+                                                                  1 &&
+                                                              registerFormKey
+                                                                  .currentState!
+                                                                  .validate()) {
+                                                            context
+                                                                .read<
+                                                                    AuthCubit>()
+                                                                .register();
+                                                          }
+                                                        },
+                                                        child: Text("Submit")),
+                                                  ],
+                                                )
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    );
+                                  });
                             },
                             icon: const Icon(Icons.person));
                       },
@@ -83,14 +310,24 @@ class _BrowserScreenState extends State<BrowserScreen> {
                       scrollDirection: Axis.horizontal,
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
-                        children:
-                            context.read<BookmarksCubit>().temp.map((bookmark) {
-                          return FolderWidget(
-                            bookmarks:
-                                context.read<BookmarksCubit>().myBookmarks,
-                            folderName: bookmark.name!,
-                          );
-                        }).toList(),
+                        children: (UserInfo.loggedUser != null)
+                            ? UserInfo.loggedUser!.items!.map((bookmark) {
+                                if (bookmark.type! == "F") {
+                                  return FolderWidget(
+                                    bookmarks: bookmark.items ?? [],
+                                    folderName: bookmark.name!,
+                                    folderId: bookmark.id!,
+                                  );
+                                } else {
+                                  return BookmarkWidget(
+                                      bookmark: Bookmark(
+                                          bookmarkId: bookmark.id,
+                                          label: bookmark.label,
+                                          name: bookmark.name,
+                                          url: bookmark.url));
+                                }
+                              }).toList()
+                            : [],
                       ),
                     ),
                     Row(
@@ -104,7 +341,162 @@ class _BrowserScreenState extends State<BrowserScreen> {
                                   showDialog(
                                       context: context,
                                       builder: (context) {
-                                        return DialogWithTabs();
+                                        return DialogWithTabs(
+                                          onPressed: () {
+                                            if (addTabController.index == 0 &&
+                                                addBookmarkFormKey.currentState!
+                                                    .validate()) {
+                                              context
+                                                  .read<BookmarksCubit>()
+                                                  .addBookmark();
+                                            } else if (addTabController.index ==
+                                                    1 &&
+                                                addFolderFormKey.currentState!
+                                                    .validate()) {
+                                              context
+                                                  .read<BookmarksCubit>()
+                                                  .addFolder();
+                                            }
+                                          },
+                                          tabController: addTabController,
+                                          tabs: [
+                                            Tab(text: "Bookmark"),
+                                            Tab(
+                                              text: "Folder",
+                                            )
+                                          ],
+                                          children: [
+                                            Padding(
+                                              padding:
+                                                  const EdgeInsets.all(8.0),
+                                              child: Form(
+                                                key: addBookmarkFormKey,
+                                                child: SingleChildScrollView(
+                                                  child: Column(
+                                                    children: [
+                                                      TextFormField(
+                                                        decoration:
+                                                            const InputDecoration(
+                                                          border:
+                                                              OutlineInputBorder(),
+                                                          labelText:
+                                                              'Bookmark Name',
+                                                        ),
+                                                        controller: context
+                                                            .read<
+                                                                BookmarksCubit>()
+                                                            .addBookmarkNameController,
+                                                        validator: (value) {
+                                                          if (value == null ||
+                                                              value.isEmpty) {
+                                                            return "Bookmark name cannot be empty";
+                                                          }
+                                                          return null;
+                                                        },
+                                                      ),
+                                                      const SizedBox(
+                                                          height: 10),
+                                                      TextFormField(
+                                                          decoration:
+                                                              const InputDecoration(
+                                                            border:
+                                                                OutlineInputBorder(),
+                                                            labelText:
+                                                                'Bookmark URL',
+                                                          ),
+                                                          controller: context
+                                                              .read<
+                                                                  BookmarksCubit>()
+                                                              .addBookmarkURLController,
+                                                          validator: (value) {
+                                                            if (value == null ||
+                                                                value.isEmpty) {
+                                                              return "Bookmark URL cannot be empty";
+                                                            }
+                                                            return null;
+                                                          }),
+                                                      const SizedBox(
+                                                          height: 10),
+                                                      TextFormField(
+                                                          decoration:
+                                                              const InputDecoration(
+                                                            border:
+                                                                OutlineInputBorder(),
+                                                            labelText:
+                                                                'Bookmark Label',
+                                                          ),
+                                                          controller: context
+                                                              .read<
+                                                                  BookmarksCubit>()
+                                                              .addBookmarkLabelController,
+                                                          validator: (value) {
+                                                            if (value == null ||
+                                                                value.isEmpty) {
+                                                              return "Bookmark label cannot be empty";
+                                                            }
+                                                            return null;
+                                                          }),
+                                                    ],
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                            Padding(
+                                              padding:
+                                                  const EdgeInsets.all(8.0),
+                                              child: Form(
+                                                key: addFolderFormKey,
+                                                child: SingleChildScrollView(
+                                                  child: Column(
+                                                    children: [
+                                                      TextFormField(
+                                                          decoration:
+                                                              const InputDecoration(
+                                                            border:
+                                                                OutlineInputBorder(),
+                                                            labelText:
+                                                                'Folder Name',
+                                                          ),
+                                                          controller: context
+                                                              .read<
+                                                                  BookmarksCubit>()
+                                                              .addFolderNameController,
+                                                          validator: (value) {
+                                                            if (value == null ||
+                                                                value.isEmpty) {
+                                                              return "Folder name cannot be empty";
+                                                            }
+                                                            return null;
+                                                          }),
+                                                      const SizedBox(
+                                                          height: 10),
+                                                      TextFormField(
+                                                        decoration:
+                                                            const InputDecoration(
+                                                          border:
+                                                              OutlineInputBorder(),
+                                                          labelText:
+                                                              'Folder Label',
+                                                        ),
+                                                        controller: context
+                                                            .read<
+                                                                BookmarksCubit>()
+                                                            .addFolderLabelController,
+                                                        validator: (value) {
+                                                          if (value == null ||
+                                                              value.isEmpty) {
+                                                            return "Folder label cannot be empty";
+                                                          }
+                                                          return null;
+                                                        },
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        );
                                       });
                                 }),
                           ),
@@ -152,140 +544,5 @@ class _BrowserScreenState extends State<BrowserScreen> {
         );
       },
     );
-  }
-
-  void _buildLoginDialog(
-      BuildContext context, GlobalKey<FormState> loginFormKey) {
-    showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-            title: const Text("Login"),
-            content: Form(
-              key: loginFormKey,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  TextFormField(
-                    decoration: const InputDecoration(
-                      border: OutlineInputBorder(),
-                      labelText: 'Email',
-                    ),
-                    controller: context.read<AuthCubit>().loginEmailController,
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Email cannot be empty';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 10),
-                  TextFormField(
-                      decoration: const InputDecoration(
-                        border: OutlineInputBorder(),
-                        labelText: 'Password',
-                      ),
-                      controller:
-                          context.read<AuthCubit>().loginPasswordController,
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Password cannot be empty';
-                        }
-                        return null;
-                      }),
-                ],
-              ),
-            ),
-            actions: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  TextButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                    child: const Text("Cancel"),
-                  ),
-                  TextButton(
-                    onPressed: () {
-                      if (loginFormKey.currentState!.validate()) {
-                        context.read<AuthCubit>().login();
-                      }
-                    },
-                    child: const Text("Login"),
-                  ),
-                ],
-              )
-            ],
-          );
-        });
-  }
-
-  void _buildRegisterDialog(
-      BuildContext context, GlobalKey<FormState> registerFormKey) {
-    showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-            title: const Text("Register"),
-            content: Form(
-              key: registerFormKey,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  TextFormField(
-                    decoration: const InputDecoration(
-                      border: OutlineInputBorder(),
-                      labelText: 'Email',
-                    ),
-                    controller:
-                        context.read<AuthCubit>().registerEmailController,
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Email cannot be empty';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 10),
-                  TextFormField(
-                      decoration: const InputDecoration(
-                        border: OutlineInputBorder(),
-                        labelText: 'Password',
-                      ),
-                      controller:
-                          context.read<AuthCubit>().registerPasswordController,
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Password cannot be empty';
-                        }
-                        return null;
-                      }),
-                ],
-              ),
-            ),
-            actions: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  TextButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                    child: const Text("Cancel"),
-                  ),
-                  TextButton(
-                    onPressed: () {
-                      if (registerFormKey.currentState!.validate()) {
-                        context.read<AuthCubit>().register();
-                      }
-                    },
-                    child: const Text("Register"),
-                  ),
-                ],
-              )
-            ],
-          );
-        });
   }
 }

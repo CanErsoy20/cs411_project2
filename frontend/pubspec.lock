@@ -147,6 +147,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.10.0"
+  motion_toast:
+    dependency: "direct main"
+    description:
+      name: motion_toast
+      sha256: "1bdd11696de9151804644d3dadcbcfaa55749db0353aeca150389ecdeb2eaaac"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.7.10"
   nested:
     dependency: transitive
     description:
@@ -250,4 +258,4 @@ packages:
     version: "0.3.0"
 sdks:
   dart: ">=3.2.1 <4.0.0"
-  flutter: ">=1.16.0"
+  flutter: ">=1.17.0"

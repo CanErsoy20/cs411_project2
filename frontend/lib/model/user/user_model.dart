@@ -1,18 +1,30 @@
-class UserModel {
-  int? id;
-  String? email;
+import 'package:cs411_project2/model/bookmark_item_model.dart';
 
-  UserModel({this.id, this.email});
+class UserModel {
+  int? userId;
+  String? email;
+  List<BookmarkItemModel>? items;
+
+  UserModel({this.userId, this.email, this.items});
 
   UserModel.fromJson(Map<String, dynamic> json) {
-    id = json['id'];
+    userId = json['userId'];
     email = json['email'];
+    if (json['items'] != null) {
+      items = <BookmarkItemModel>[];
+      json['items'].forEach((v) {
+        items!.add(BookmarkItemModel.fromJson(v));
+      });
+    }
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
-    data['id'] = id;
+    data['userId'] = userId;
     data['email'] = email;
+    if (items != null) {
+      data['items'] = items!.map((v) => v.toJson()).toList();
+    }
     return data;
   }
 }

@@ -1,6 +1,8 @@
 import 'package:bloc/bloc.dart';
+import 'package:cs411_project2/model/assing_bookmark_model.dart';
 import 'package:cs411_project2/model/new_bookmark_model.dart';
 import 'package:cs411_project2/model/new_folder_model.dart';
+import 'package:cs411_project2/model/user/user_info.dart';
 import 'package:cs411_project2/services/bookmark_service.dart';
 import 'package:flutter/material.dart';
 
@@ -57,12 +59,17 @@ class BookmarksCubit extends Cubit<BookmarksState> {
     NewBookmarkModel newModel = NewBookmarkModel(
         name: addBookmarkNameController.text,
         url: addBookmarkURLController.text,
-        label: addBookmarkLabelController.text);
+        label: addBookmarkLabelController.text,
+        type: "B",
+        user: UserBookmark(userId: UserInfo.loggedUser!.userId));
     final response = await service.addBookmark(newModel);
     if (response == null) {
-      emit(BookmarksError(title: "Error", description: ""));
+      emit(BookmarksError(
+          title: "Error", description: "Could not add bookmark"));
     } else {
-      emit(BookmarksSuccess(title: "Success", description: ""));
+      emit(BookmarksSuccess(
+          title: "Bookmark Added Successfully",
+          description: "${newModel.name} added successfully"));
     }
   }
 
@@ -70,22 +77,28 @@ class BookmarksCubit extends Cubit<BookmarksState> {
     emit(BookmarksLoading());
     NewFolderModel newFolderModel = NewFolderModel(
         name: addFolderNameController.text,
-        label: addFolderLabelController.text);
+        label: addFolderLabelController.text,
+        type: "F",
+        user: UserFolder(userId: UserInfo.loggedUser!.userId));
     final response = await service.addFolder(newFolderModel);
     if (response == null) {
-      emit(BookmarksError(title: "Error", description: ""));
+      emit(BookmarksError(
+          title: "Error", description: "Could not add bookmark"));
     } else {
-      emit(BookmarksSuccess(title: "Success", description: ""));
+      emit(BookmarksSuccess(
+          title: "Folder Added Successfully",
+          description: " ${newFolderModel.name} added successfully"));
     }
   }
 
-  Future<void> assignBookmark() async {
+  Future<void> assignBookmark(int folderId) async {
     emit(BookmarksLoading());
-    NewBookmarkModel newModel = NewBookmarkModel(
+    AssignBookmarkModel newModel = AssignBookmarkModel(
         name: assignBookmarkNameController.text,
         url: assignBookmarkURLController.text,
-        label: assignBookmarkLabelController.text);
-    final response = await service.assignBookmark(newModel);
+        label: assignBookmarkLabelController.text,
+        type: "B");
+    final response = await service.assignBookmark(newModel, folderId);
     if (response == null) {
       emit(BookmarksError(title: "Error", description: ""));
     } else {
@@ -111,6 +124,19 @@ class BookmarksCubit extends Cubit<BookmarksState> {
     } else {
       emit(BookmarksSuccess(title: "Success", description: ""));
     }
+  }
+
+  // Clear textfields
+
+  void clearForms() {
+    addBookmarkNameController.clear();
+    addBookmarkURLController.clear();
+    addBookmarkLabelController.clear();
+    addFolderNameController.clear();
+    addFolderLabelController.clear();
+    assignBookmarkNameController.clear();
+    assignBookmarkURLController.clear();
+    assignBookmarkLabelController.clear();
   }
 
   // Search and Filter methods
@@ -153,6 +179,11 @@ class BookmarksCubit extends Cubit<BookmarksState> {
   void clearSearch() {
     searchBookmarkController.clear();
     temp = myBookmarks;
+    emit(BookmarksDisplay());
+  }
+
+  void refresh() {
+    emit(BookmarksChecking());
     emit(BookmarksDisplay());
   }
 }

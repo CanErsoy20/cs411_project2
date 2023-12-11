@@ -39,6 +39,7 @@ dependencies:
   bloc: ^8.1.2
   http: ^1.1.2
   filter_list: ^1.0.2
+  motion_toast: ^2.7.10
 
 dev_dependencies:
   flutter_test:

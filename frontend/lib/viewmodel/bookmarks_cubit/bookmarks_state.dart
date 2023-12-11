@@ -23,3 +23,5 @@ final class BookmarksSuccess extends BookmarksState {
 
   BookmarksSuccess({required this.title, required this.description});
 }
+
+final class BookmarksChecking extends BookmarksState {}
