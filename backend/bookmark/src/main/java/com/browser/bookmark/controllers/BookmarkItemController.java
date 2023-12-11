@@ -78,10 +78,10 @@ public class BookmarkItemController {
     }
 
     @CrossOrigin(origins = "*")
-    @GetMapping("/labels")
-    public Response getLabels() {
+    @GetMapping("/labels/{id}")
+    public Response getLabels(@PathVariable("id") long id) {
         try {
-            List<String> labels = bookmarkItemService.findLabels();
+            List<String> labels = bookmarkItemService.findLabels(id);
             return new Response("Success", 200, labels);
         } catch (Exception e) {
             e.printStackTrace();
