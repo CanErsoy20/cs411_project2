@@ -65,6 +65,10 @@ class _BrowserScreenState extends State<BrowserScreen>
                         onPressed: () {}, icon: const Icon(Icons.arrow_back)),
                     const SizedBox(width: 10),
                     IconButton(
+                        onPressed: () {},
+                        icon: const Icon(Icons.arrow_forward)),
+                    const SizedBox(width: 10),
+                    IconButton(
                         onPressed: () {}, icon: const Icon(Icons.refresh)),
                     const SizedBox(width: 10),
                     Expanded(

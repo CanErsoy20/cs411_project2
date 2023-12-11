@@ -90,12 +90,12 @@ BEGIN
         BLOCK "040904e4"
         BEGIN
             VALUE "CompanyName", "com.example" "\0"
-            VALUE "FileDescription", "cs411_project2" "\0"
+            VALUE "FileDescription", "OnlyBrowser" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
-            VALUE "InternalName", "cs411_project2" "\0"
+            VALUE "InternalName", "OnlyBrowser" "\0"
             VALUE "LegalCopyright", "Copyright (C) 2023 com.example. All rights reserved." "\0"
-            VALUE "OriginalFilename", "cs411_project2.exe" "\0"
-            VALUE "ProductName", "cs411_project2" "\0"
+            VALUE "OriginalFilename", "OnlyBrowser.exe" "\0"
+            VALUE "ProductName", "OnlyBrowser" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END

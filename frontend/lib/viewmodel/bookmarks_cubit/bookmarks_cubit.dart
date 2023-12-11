@@ -150,7 +150,6 @@ class BookmarksCubit extends Cubit<BookmarksState> {
           .where((element) =>
               element.name!.toLowerCase().contains(query.toLowerCase()))
           .toList();
-
       emit(BookmarksDisplay());
     } else {
       temp = myBookmarkItems;
@@ -159,25 +158,25 @@ class BookmarksCubit extends Cubit<BookmarksState> {
   }
 
   void setFilters() {
-    // filters = filterList
-    //     .map(
-    //       (filter) => PopupMenuItem(
-    //           value: filter.title,
-    //           child: CheckboxListTile(
-    //               controlAffinity: ListTileControlAffinity.leading,
-    //               title: Text(filter.title!),
-    //               value: filter.value,
-    //               onChanged: (value) {
-    //                 changeFilter(filter.title!, value ?? false);
-    //               })),
-    //     )
-    //     .toList();
+    filters = filterList
+        .map(
+          (filter) => PopupMenuItem(
+              value: filter.title,
+              child: CheckboxListTile(
+                  controlAffinity: ListTileControlAffinity.leading,
+                  title: Text(filter.title!),
+                  value: filter.value,
+                  onChanged: (value) {
+                    changeFilter(filter.title!, value ?? false);
+                  })),
+        )
+        .toList();
   }
 
   void changeFilter(String title, bool value) {
-    // filterList.firstWhere((element) => element.title == title).value = value;
-    // setFilters();
-    // emit(BookmarksDisplay());
+    filterList.firstWhere((element) => element.title == title).value = value;
+    setFilters();
+    emit(BookmarksDisplay());
   }
 
   void clearSearch() {
