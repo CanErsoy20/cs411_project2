@@ -20,11 +20,6 @@ class BrowserScreen extends StatefulWidget {
 class _BrowserScreenState extends State<BrowserScreen>
     with TickerProviderStateMixin {
   @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
   Widget build(BuildContext context) {
     final GlobalKey<FormState> loginFormKey = GlobalKey<FormState>();
     final GlobalKey<FormState> registerFormKey = GlobalKey<FormState>();
@@ -32,8 +27,8 @@ class _BrowserScreenState extends State<BrowserScreen>
     final GlobalKey<FormState> addFolderFormKey = GlobalKey<FormState>();
     TabController addTabController = TabController(length: 2, vsync: this);
     TabController authTabController = TabController(length: 2, vsync: this);
+
     return BlocConsumer<BookmarksCubit, BookmarksState>(
-      bloc: context.read<BookmarksCubit>()..setFilters(),
       listener: (context, state) {
         if (state is BookmarksSuccess) {
           CustomSnackbars.displaySuccessMotionToast(
@@ -96,7 +91,6 @@ class _BrowserScreenState extends State<BrowserScreen>
                           CustomSnackbars.displaySuccessMotionToast(
                               context, state.title, state.description, () {
                             context.read<BookmarksCubit>().getMyBookmarks();
-                            context.read<BookmarksCubit>().refresh();
                             Navigator.pop(context);
                           });
                         } else if (state is AuthError) {
@@ -318,6 +312,12 @@ class _BrowserScreenState extends State<BrowserScreen>
                                               context
                                                   .read<AuthCubit>()
                                                   .logout();
+                                              context
+                                                  .read<BookmarksCubit>()
+                                                  .selectedFilters = [];
+                                              context
+                                                  .read<BookmarksCubit>()
+                                                  .labels = [];
                                               context
                                                   .read<BookmarksCubit>()
                                                   .myBookmarkItems = [];
@@ -585,12 +585,95 @@ class _BrowserScreenState extends State<BrowserScreen>
                         ),
                         Padding(
                           padding: const EdgeInsets.all(8.0),
-                          child: PopupMenuButton(
-                            tooltip: "Filter Bookmarks",
-                            itemBuilder: (context) =>
-                                context.read<BookmarksCubit>().filters,
-                            child: const Icon(Icons.filter_list),
-                          ),
+                          child: IconButton(
+                              onPressed: () {
+                                showDialog(
+                                    context: context,
+                                    builder: (context) {
+                                      return Dialog(
+                                        child: BlocBuilder<BookmarksCubit,
+                                            BookmarksState>(
+                                          builder: (context, state) {
+                                            return SizedBox(
+                                              width: 400,
+                                              child: Column(
+                                                mainAxisSize: MainAxisSize.min,
+                                                children: [
+                                                  ListView.builder(
+                                                    shrinkWrap: true,
+                                                    itemCount: context
+                                                        .read<BookmarksCubit>()
+                                                        .labels
+                                                        .length,
+                                                    itemBuilder:
+                                                        (context, index) {
+                                                      return CheckboxListTile(
+                                                          controlAffinity:
+                                                              ListTileControlAffinity
+                                                                  .leading,
+                                                          title: Text(context
+                                                              .read<
+                                                                  BookmarksCubit>()
+                                                              .labels[index]),
+                                                          value: context
+                                                              .read<
+                                                                  BookmarksCubit>()
+                                                              .selectedFilters
+                                                              .contains(context
+                                                                  .read<
+                                                                      BookmarksCubit>()
+                                                                  .labels[index]),
+                                                          onChanged: (value) {
+                                                            context
+                                                                .read<
+                                                                    BookmarksCubit>()
+                                                                .refresh();
+                                                            if (value != null) {
+                                                              if (value) {
+                                                                context
+                                                                    .read<
+                                                                        BookmarksCubit>()
+                                                                    .selectedFilters
+                                                                    .add(context
+                                                                        .read<
+                                                                            BookmarksCubit>()
+                                                                        .labels[index]);
+                                                              } else {
+                                                                context
+                                                                    .read<
+                                                                        BookmarksCubit>()
+                                                                    .selectedFilters
+                                                                    .remove(context
+                                                                        .read<
+                                                                            BookmarksCubit>()
+                                                                        .labels[index]);
+                                                              }
+                                                            }
+                                                          });
+                                                    },
+                                                  ),
+                                                  TextButton(
+                                                      onPressed: () {
+                                                        context
+                                                            .read<
+                                                                BookmarksCubit>()
+                                                            .refresh();
+                                                        context
+                                                            .read<
+                                                                BookmarksCubit>()
+                                                            .filterByLabel();
+                                                        Navigator.pop(context);
+                                                      },
+                                                      child: Text("Apply"))
+                                                ],
+                                              ),
+                                            );
+                                          },
+                                        ),
+                                      );
+                                    });
+                              },
+                              icon: Icon(Icons.filter_list)),
                         )
                       ],
                     )

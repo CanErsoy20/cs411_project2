@@ -5,6 +5,7 @@ class CustomSnackbars {
   static void displaySuccessMotionToast(BuildContext context, String title,
       String description, Function? onClose) {
     MotionToast toast = MotionToast.success(
+      toastDuration: const Duration(seconds: 1),
       onClose: onClose,
       title: Text(
         title,
@@ -22,6 +23,7 @@ class CustomSnackbars {
   static void displayWarningMotionToast(BuildContext context, String title,
       String description, Function? onClose) {
     MotionToast.warning(
+      toastDuration: const Duration(seconds: 1),
       onClose: onClose,
       title: Text(
         title,
@@ -40,6 +42,7 @@ class CustomSnackbars {
   static void displayErrorMotionToast(BuildContext context, String title,
       String description, Function? onClose) {
     MotionToast.error(
+      toastDuration: const Duration(seconds: 1),
       onClose: onClose,
       title: Text(
         title,
@@ -58,6 +61,7 @@ class CustomSnackbars {
   static void displayInfoMotionToast(BuildContext context, String title,
       String description, Function? onClose) {
     MotionToast.info(
+      toastDuration: const Duration(seconds: 1),
       onClose: onClose,
       title: Text(
         title,

@@ -29,10 +29,9 @@ class BookmarksCubit extends Cubit<BookmarksState> {
   List<BookmarkItemModel> myBookmarkItems = [];
   List<BookmarkItemModel> temp = [];
 
-  List<String> labels = ["Folder", "Bookmark"];
+  List<String> selectedFilters = [];
 
-  List<PopupMenuItem> filters = [];
-  List<Filter> filterList = [];
+  List<String> labels = [];
 
   Future<void> getMyLabels() async {
     emit(BookmarksLoading());
@@ -41,9 +40,6 @@ class BookmarksCubit extends Cubit<BookmarksState> {
       emit(BookmarksError(title: "Error", description: "Could not get labels"));
     } else {
       labels.addAll(response);
-
-      filterList.addAll(labels.map((e) => Filter(e, false)).toList());
-      setFilters();
       emit(BookmarksDisplay());
     }
   }
@@ -155,6 +151,7 @@ class BookmarksCubit extends Cubit<BookmarksState> {
 
   // Search and Filter methods
   void searchBookmark(String query) {
+    filterByLabel();
     if (query.isNotEmpty) {
       temp = myBookmarkItems
           .where((element) =>
@@ -165,29 +162,6 @@ class BookmarksCubit extends Cubit<BookmarksState> {
       temp = myBookmarkItems;
       emit(BookmarksDisplay());
     }
-  }
-
-  void setFilters() {
-    filters = filterList
-        .map(
-          (filter) => PopupMenuItem(
-              value: filter.title,
-              child: CheckboxListTile(
-                  controlAffinity: ListTileControlAffinity.leading,
-                  title: Text(filter.title!),
-                  value: filter.value,
-                  onChanged: (value) {
-                    changeFilter(filter.title!, value ?? false);
-                    filterByLabel();
-                  })),
-        )
-        .toList();
-  }
-
-  void changeFilter(String title, bool value) {
-    filterList.firstWhere((element) => element.title == title).value = value;
-    setFilters();
-    emit(BookmarksDisplay());
   }
 
   void clearSearch() {
@@ -202,11 +176,13 @@ class BookmarksCubit extends Cubit<BookmarksState> {
   }
 
   void filterByLabel() {
-    temp = temp
-        .where((element) => filterList
-            .firstWhere((filter) => filter.title == element.label)
-            .value!)
-        .toList();
+    if (selectedFilters.isEmpty) {
+      temp = myBookmarkItems;
+    } else {
+      temp = myBookmarkItems
+          .where((element) => selectedFilters.contains(element.label))
+          .toList();
+    }
     emit(BookmarksDisplay());
   }
 }
