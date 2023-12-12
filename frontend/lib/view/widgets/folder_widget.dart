@@ -43,6 +43,7 @@ class _FolderWidgetState extends State<FolderWidget>
                           bookmarkId: bookmark.id,
                           label: bookmark.label,
                           name: bookmark.name,
+                          logo: bookmark.logo,
                           url: bookmark.url)),
             ))
         .toList();
@@ -184,92 +185,6 @@ class _FolderWidgetState extends State<FolderWidget>
                       ],
                     );
                   });
-
-              // showDialog(
-              //     context: context,
-              //     builder: (context) {
-              //       return AlertDialog(
-              //         title: const Text("Add New Bookmark"),
-              //         content: Form(
-              //           key: assignBookmarkFormKey,
-              //           child: SingleChildScrollView(
-              //             child: Column(
-              //               children: [
-              //                 TextFormField(
-              //                   decoration: const InputDecoration(
-              //                     border: OutlineInputBorder(),
-              //                     labelText: 'Bookmark Name',
-              //                   ),
-              //                   controller: context
-              //                       .read<BookmarksCubit>()
-              //                       .assignBookmarkNameController,
-              //                   validator: (value) {
-              //                     if (value == null || value.isEmpty) {
-              //                       return "Bookmark name cannot be empty";
-              //                     }
-              //                     return null;
-              //                   },
-              //                 ),
-              //                 const SizedBox(height: 10),
-              //                 TextFormField(
-              //                     decoration: const InputDecoration(
-              //                       border: OutlineInputBorder(),
-              //                       labelText: 'Bookmark URL',
-              //                     ),
-              //                     controller: context
-              //                         .read<BookmarksCubit>()
-              //                         .assignBookmarkURLController,
-              //                     validator: (value) {
-              //                       if (value == null || value.isEmpty) {
-              //                         return "Bookmark URL cannot be empty";
-              //                       }
-              //                       return null;
-              //                     }),
-              //                 const SizedBox(height: 10),
-              //                 TextFormField(
-              //                     decoration: const InputDecoration(
-              //                       border: OutlineInputBorder(),
-              //                       labelText: 'Bookmark Label',
-              //                     ),
-              //                     controller: context
-              //                         .read<BookmarksCubit>()
-              //                         .assignBookmarkLabelController,
-              //                     validator: (value) {
-              //                       if (value == null || value.isEmpty) {
-              //                         return "Bookmark label cannot be empty";
-              //                       }
-              //                       return null;
-              //                     }),
-              //               ],
-              //             ),
-              //           ),
-              //         ),
-              //         actions: [
-              //           Row(
-              //             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              //             children: [
-              //               TextButton(
-              //                 onPressed: () {
-              //                   Navigator.pop(context);
-              //                 },
-              //                 child: const Text("Cancel"),
-              //               ),
-              //               TextButton(
-              //                 onPressed: () {
-              //                   if (assignBookmarkFormKey.currentState!
-              //                       .validate()) {
-              //                     context
-              //                         .read<BookmarksCubit>()
-              //                         .assignBookmark(folderId);
-              //                   }
-              //                 },
-              //                 child: const Text("Add"),
-              //               ),
-              //             ],
-              //           )
-              //         ],
-              //       );
-              //     });
             },
           )),
     );

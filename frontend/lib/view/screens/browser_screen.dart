@@ -332,7 +332,7 @@ class _BrowserScreenState extends State<BrowserScreen>
                                                   .refresh();
                                               Navigator.of(context).pop();
                                             },
-                                            child: Text("Logout")),
+                                            child: const Text("Logout")),
                                       );
                                     }
                                   });
@@ -347,338 +347,402 @@ class _BrowserScreenState extends State<BrowserScreen>
                     ),
                   ],
                 ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children:
-                            (context.read<BookmarksCubit>().temp.isNotEmpty)
-                                ? context
-                                    .read<BookmarksCubit>()
-                                    .temp
-                                    .map((bookmark) {
-                                    if (bookmark.type! == "F") {
-                                      return FolderWidget(
-                                        bookmarks: bookmark.items ?? [],
-                                        folderName: bookmark.name!,
-                                        folderId: bookmark.id!,
-                                      );
-                                    } else {
-                                      return BookmarkWidget(
-                                          bookmark: Bookmark(
-                                              bookmarkId: bookmark.id,
-                                              label: bookmark.label,
-                                              name: bookmark.name,
-                                              url: bookmark.url));
-                                    }
-                                  }).toList()
-                                : [],
-                      ),
-                    ),
-                    Row(
-                      children: [
-                        Card(
-                          child: Tooltip(
-                            message: "Add New Bookmark/Folder",
-                            child: IconButton(
-                                icon: const Icon(Icons.add),
-                                onPressed: () {
-                                  if (UserInfo.loggedUser != null) {
-                                    showDialog(
-                                        context: context,
-                                        builder: (context) {
-                                          return DialogWithTabs(
-                                            onPressed: () {
-                                              if (addTabController.index == 0 &&
-                                                  addBookmarkFormKey
-                                                      .currentState!
-                                                      .validate()) {
-                                                context
-                                                    .read<BookmarksCubit>()
-                                                    .addBookmark();
-                                              } else if (addTabController
-                                                          .index ==
-                                                      1 &&
-                                                  addFolderFormKey.currentState!
-                                                      .validate()) {
-                                                context
-                                                    .read<BookmarksCubit>()
-                                                    .addFolder();
-                                              }
-                                            },
-                                            tabController: addTabController,
-                                            tabs: const [
-                                              Tab(text: "Bookmark"),
-                                              Tab(
-                                                text: "Folder",
-                                              )
-                                            ],
-                                            children: [
-                                              Padding(
-                                                padding:
-                                                    const EdgeInsets.all(8.0),
-                                                child: Form(
-                                                  key: addBookmarkFormKey,
-                                                  child: SingleChildScrollView(
-                                                    child: Column(
-                                                      children: [
-                                                        TextFormField(
-                                                          decoration:
-                                                              const InputDecoration(
-                                                            border:
-                                                                OutlineInputBorder(),
-                                                            labelText:
-                                                                'Bookmark Name',
-                                                          ),
-                                                          controller: context
-                                                              .read<
-                                                                  BookmarksCubit>()
-                                                              .addBookmarkNameController,
-                                                          validator: (value) {
-                                                            if (value == null ||
-                                                                value.isEmpty) {
-                                                              return "Bookmark name cannot be empty";
-                                                            }
-                                                            return null;
-                                                          },
-                                                        ),
-                                                        const SizedBox(
-                                                            height: 10),
-                                                        TextFormField(
-                                                            decoration:
-                                                                const InputDecoration(
-                                                              border:
-                                                                  OutlineInputBorder(),
-                                                              labelText:
-                                                                  'Bookmark URL',
-                                                            ),
-                                                            controller: context
-                                                                .read<
-                                                                    BookmarksCubit>()
-                                                                .addBookmarkURLController,
-                                                            validator: (value) {
-                                                              if (value ==
-                                                                      null ||
-                                                                  value
-                                                                      .isEmpty) {
-                                                                return "Bookmark URL cannot be empty";
-                                                              }
-                                                              return null;
-                                                            }),
-                                                        const SizedBox(
-                                                            height: 10),
-                                                        TextFormField(
-                                                            decoration:
-                                                                const InputDecoration(
-                                                              border:
-                                                                  OutlineInputBorder(),
-                                                              labelText:
-                                                                  'Bookmark Label',
-                                                            ),
-                                                            controller: context
-                                                                .read<
-                                                                    BookmarksCubit>()
-                                                                .addBookmarkLabelController,
-                                                            validator: (value) {
-                                                              if (value ==
-                                                                      null ||
-                                                                  value
-                                                                      .isEmpty) {
-                                                                return "Bookmark label cannot be empty";
-                                                              }
-                                                              return null;
-                                                            }),
-                                                      ],
-                                                    ),
-                                                  ),
-                                                ),
-                                              ),
-                                              Padding(
-                                                padding:
-                                                    const EdgeInsets.all(8.0),
-                                                child: Form(
-                                                  key: addFolderFormKey,
-                                                  child: SingleChildScrollView(
-                                                    child: Column(
-                                                      children: [
-                                                        TextFormField(
-                                                            decoration:
-                                                                const InputDecoration(
-                                                              border:
-                                                                  OutlineInputBorder(),
-                                                              labelText:
-                                                                  'Folder Name',
-                                                            ),
-                                                            controller: context
-                                                                .read<
-                                                                    BookmarksCubit>()
-                                                                .addFolderNameController,
-                                                            validator: (value) {
-                                                              if (value ==
-                                                                      null ||
-                                                                  value
-                                                                      .isEmpty) {
-                                                                return "Folder name cannot be empty";
-                                                              }
-                                                              return null;
-                                                            }),
-                                                        const SizedBox(
-                                                            height: 10),
-                                                        TextFormField(
-                                                          decoration:
-                                                              const InputDecoration(
-                                                            border:
-                                                                OutlineInputBorder(),
-                                                            labelText:
-                                                                'Folder Label',
-                                                          ),
-                                                          controller: context
-                                                              .read<
-                                                                  BookmarksCubit>()
-                                                              .addFolderLabelController,
-                                                          validator: (value) {
-                                                            if (value == null ||
-                                                                value.isEmpty) {
-                                                              return "Folder label cannot be empty";
-                                                            }
-                                                            return null;
-                                                          },
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  ),
-                                                ),
-                                              ),
-                                            ],
-                                          );
-                                        });
-                                  }
-                                }),
-                          ),
-                        ),
-                        SizedBox(
-                          width: 200,
-                          height: 35,
-                          child: TextField(
-                            controller: context
-                                .read<BookmarksCubit>()
-                                .searchBookmarkController,
-                            decoration: InputDecoration(
-                              border: const OutlineInputBorder(),
-                              labelText: "Search Bookmarks",
-                              suffixIcon: IconButton(
-                                icon: const Icon(Icons.clear),
-                                onPressed: () {
-                                  context.read<BookmarksCubit>().clearSearch();
-                                },
-                              ),
+                state is BookmarksLoading
+                    ? const CircularProgressIndicator()
+                    : Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: (context
+                                      .read<BookmarksCubit>()
+                                      .temp
+                                      .isNotEmpty)
+                                  ? context
+                                      .read<BookmarksCubit>()
+                                      .temp
+                                      .map((bookmark) {
+                                      if (bookmark.type! == "F") {
+                                        return FolderWidget(
+                                          bookmarks: bookmark.items ?? [],
+                                          folderName: bookmark.name!,
+                                          folderId: bookmark.id!,
+                                        );
+                                      } else {
+                                        return BookmarkWidget(
+                                            bookmark: Bookmark(
+                                                bookmarkId: bookmark.id,
+                                                label: bookmark.label,
+                                                name: bookmark.name,
+                                                url: bookmark.url,
+                                                logo: bookmark.logo!));
+                                      }
+                                    }).toList()
+                                  : [],
                             ),
-                            onChanged: (value) {
-                              context
-                                  .read<BookmarksCubit>()
-                                  .searchBookmark(value);
-                            },
                           ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: IconButton(
-                              onPressed: () {
-                                showDialog(
-                                    context: context,
-                                    builder: (context) {
-                                      return Dialog(
-                                        child: BlocBuilder<BookmarksCubit,
-                                            BookmarksState>(
-                                          builder: (context, state) {
-                                            return SizedBox(
-                                              width: 400,
-                                              child: Column(
-                                                mainAxisSize: MainAxisSize.min,
-                                                children: [
-                                                  ListView.builder(
-                                                    shrinkWrap: true,
-                                                    itemCount: context
-                                                        .read<BookmarksCubit>()
-                                                        .labels
-                                                        .length,
-                                                    itemBuilder:
-                                                        (context, index) {
-                                                      return CheckboxListTile(
-                                                          controlAffinity:
-                                                              ListTileControlAffinity
-                                                                  .leading,
-                                                          title: Text(context
-                                                              .read<
-                                                                  BookmarksCubit>()
-                                                              .labels[index]),
-                                                          value: context
-                                                              .read<
-                                                                  BookmarksCubit>()
-                                                              .selectedFilters
-                                                              .contains(context
-                                                                  .read<
-                                                                      BookmarksCubit>()
-                                                                  .labels[index]),
-                                                          onChanged: (value) {
-                                                            context
+                          Row(
+                            children: [
+                              Card(
+                                child: Tooltip(
+                                  message: "Add New Bookmark/Folder",
+                                  child: IconButton(
+                                      icon: const Icon(Icons.add),
+                                      onPressed: () {
+                                        if (UserInfo.loggedUser != null) {
+                                          showDialog(
+                                              context: context,
+                                              builder: (context) {
+                                                return DialogWithTabs(
+                                                  onPressed: () {
+                                                    if (addTabController
+                                                                .index ==
+                                                            0 &&
+                                                        addBookmarkFormKey
+                                                            .currentState!
+                                                            .validate()) {
+                                                      context
+                                                          .read<
+                                                              BookmarksCubit>()
+                                                          .addBookmark();
+                                                    } else if (addTabController
+                                                                .index ==
+                                                            1 &&
+                                                        addFolderFormKey
+                                                            .currentState!
+                                                            .validate()) {
+                                                      context
+                                                          .read<
+                                                              BookmarksCubit>()
+                                                          .addFolder();
+                                                    }
+                                                  },
+                                                  tabController:
+                                                      addTabController,
+                                                  tabs: const [
+                                                    Tab(text: "Bookmark"),
+                                                    Tab(
+                                                      text: "Folder",
+                                                    )
+                                                  ],
+                                                  children: [
+                                                    Padding(
+                                                      padding:
+                                                          const EdgeInsets.all(
+                                                              8.0),
+                                                      child: Form(
+                                                        key: addBookmarkFormKey,
+                                                        child:
+                                                            SingleChildScrollView(
+                                                          child: Column(
+                                                            children: [
+                                                              TextFormField(
+                                                                decoration:
+                                                                    const InputDecoration(
+                                                                  border:
+                                                                      OutlineInputBorder(),
+                                                                  labelText:
+                                                                      'Bookmark Name',
+                                                                ),
+                                                                controller: context
+                                                                    .read<
+                                                                        BookmarksCubit>()
+                                                                    .addBookmarkNameController,
+                                                                validator:
+                                                                    (value) {
+                                                                  if (value ==
+                                                                          null ||
+                                                                      value
+                                                                          .isEmpty) {
+                                                                    return "Bookmark name cannot be empty";
+                                                                  }
+                                                                  return null;
+                                                                },
+                                                              ),
+                                                              const SizedBox(
+                                                                  height: 10),
+                                                              TextFormField(
+                                                                  decoration:
+                                                                      const InputDecoration(
+                                                                    border:
+                                                                        OutlineInputBorder(),
+                                                                    labelText:
+                                                                        'Bookmark URL',
+                                                                  ),
+                                                                  controller: context
+                                                                      .read<
+                                                                          BookmarksCubit>()
+                                                                      .addBookmarkURLController,
+                                                                  validator:
+                                                                      (value) {
+                                                                    if (value ==
+                                                                            null ||
+                                                                        value
+                                                                            .isEmpty) {
+                                                                      return "Bookmark URL cannot be empty";
+                                                                    }
+                                                                    return null;
+                                                                  }),
+                                                              const SizedBox(
+                                                                  height: 10),
+                                                              TextFormField(
+                                                                  decoration:
+                                                                      const InputDecoration(
+                                                                    border:
+                                                                        OutlineInputBorder(),
+                                                                    labelText:
+                                                                        'Bookmark Label',
+                                                                  ),
+                                                                  controller: context
+                                                                      .read<
+                                                                          BookmarksCubit>()
+                                                                      .addBookmarkLabelController,
+                                                                  validator:
+                                                                      (value) {
+                                                                    if (value ==
+                                                                            null ||
+                                                                        value
+                                                                            .isEmpty) {
+                                                                      return "Bookmark label cannot be empty";
+                                                                    }
+                                                                    return null;
+                                                                  }),
+                                                            ],
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    Padding(
+                                                      padding:
+                                                          const EdgeInsets.all(
+                                                              8.0),
+                                                      child: Form(
+                                                        key: addFolderFormKey,
+                                                        child:
+                                                            SingleChildScrollView(
+                                                          child: Column(
+                                                            children: [
+                                                              TextFormField(
+                                                                  decoration:
+                                                                      const InputDecoration(
+                                                                    border:
+                                                                        OutlineInputBorder(),
+                                                                    labelText:
+                                                                        'Folder Name',
+                                                                  ),
+                                                                  controller: context
+                                                                      .read<
+                                                                          BookmarksCubit>()
+                                                                      .addFolderNameController,
+                                                                  validator:
+                                                                      (value) {
+                                                                    if (value ==
+                                                                            null ||
+                                                                        value
+                                                                            .isEmpty) {
+                                                                      return "Folder name cannot be empty";
+                                                                    }
+                                                                    return null;
+                                                                  }),
+                                                              const SizedBox(
+                                                                  height: 10),
+                                                              TextFormField(
+                                                                decoration:
+                                                                    const InputDecoration(
+                                                                  border:
+                                                                      OutlineInputBorder(),
+                                                                  labelText:
+                                                                      'Folder Label',
+                                                                ),
+                                                                controller: context
+                                                                    .read<
+                                                                        BookmarksCubit>()
+                                                                    .addFolderLabelController,
+                                                                validator:
+                                                                    (value) {
+                                                                  if (value ==
+                                                                          null ||
+                                                                      value
+                                                                          .isEmpty) {
+                                                                    return "Folder label cannot be empty";
+                                                                  }
+                                                                  return null;
+                                                                },
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                );
+                                              });
+                                        }
+                                      }),
+                                ),
+                              ),
+                              SizedBox(
+                                width: 220,
+                                height: 35,
+                                child: TextField(
+                                  controller: context
+                                      .read<BookmarksCubit>()
+                                      .searchBookmarkController,
+                                  decoration: InputDecoration(
+                                    border: const OutlineInputBorder(),
+                                    labelText: "Search Bookmarks",
+                                    suffixIcon: IconButton(
+                                      icon: const Icon(Icons.clear),
+                                      onPressed: () {
+                                        context
+                                            .read<BookmarksCubit>()
+                                            .clearSearch();
+                                      },
+                                    ),
+                                  ),
+                                  onChanged: (value) {
+                                    context
+                                        .read<BookmarksCubit>()
+                                        .searchBookmark(value);
+                                  },
+                                ),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: IconButton(
+                                    onPressed: () {
+                                      showDialog(
+                                          context: context,
+                                          builder: (context) {
+                                            return Dialog(
+                                              child: BlocBuilder<BookmarksCubit,
+                                                  BookmarksState>(
+                                                builder: (context, state) {
+                                                  return Padding(
+                                                    padding:
+                                                        const EdgeInsets.all(
+                                                            8.0),
+                                                    child: SizedBox(
+                                                      width: 400,
+                                                      child: Column(
+                                                        mainAxisSize:
+                                                            MainAxisSize.min,
+                                                        children: [
+                                                          ListView.builder(
+                                                            shrinkWrap: true,
+                                                            itemCount: context
                                                                 .read<
                                                                     BookmarksCubit>()
-                                                                .refresh();
-                                                            if (value != null) {
-                                                              if (value) {
-                                                                context
-                                                                    .read<
-                                                                        BookmarksCubit>()
-                                                                    .selectedFilters
-                                                                    .add(context
+                                                                .labels
+                                                                .length,
+                                                            itemBuilder:
+                                                                (context,
+                                                                    index) {
+                                                              return CheckboxListTile(
+                                                                  controlAffinity:
+                                                                      ListTileControlAffinity
+                                                                          .leading,
+                                                                  title: Text(context
+                                                                          .read<
+                                                                              BookmarksCubit>()
+                                                                          .labels[
+                                                                      index]),
+                                                                  value: context
+                                                                      .read<
+                                                                          BookmarksCubit>()
+                                                                      .selectedFilters
+                                                                      .contains(context
+                                                                          .read<
+                                                                              BookmarksCubit>()
+                                                                          .labels[index]),
+                                                                  onChanged: (value) {
+                                                                    context
                                                                         .read<
                                                                             BookmarksCubit>()
-                                                                        .labels[index]);
-                                                              } else {
-                                                                context
-                                                                    .read<
-                                                                        BookmarksCubit>()
-                                                                    .selectedFilters
-                                                                    .remove(context
+                                                                        .refresh();
+                                                                    if (value !=
+                                                                        null) {
+                                                                      if (value) {
+                                                                        context
+                                                                            .read<BookmarksCubit>()
+                                                                            .selectedFilters
+                                                                            .add(context.read<BookmarksCubit>().labels[index]);
+                                                                      } else {
+                                                                        context
+                                                                            .read<BookmarksCubit>()
+                                                                            .selectedFilters
+                                                                            .remove(context.read<BookmarksCubit>().labels[index]);
+                                                                      }
+                                                                    }
+                                                                  });
+                                                            },
+                                                          ),
+                                                          Row(
+                                                            mainAxisAlignment:
+                                                                MainAxisAlignment
+                                                                    .spaceAround,
+                                                            children: [
+                                                              TextButton(
+                                                                  onPressed:
+                                                                      () {
+                                                                    context
                                                                         .read<
                                                                             BookmarksCubit>()
-                                                                        .labels[index]);
-                                                              }
-                                                            }
-                                                          });
-                                                    },
-                                                  ),
-                                                  TextButton(
-                                                      onPressed: () {
-                                                        context
-                                                            .read<
-                                                                BookmarksCubit>()
-                                                            .refresh();
-                                                        context
-                                                            .read<
-                                                                BookmarksCubit>()
-                                                            .filterByLabel();
-                                                        Navigator.pop(context);
-                                                      },
-                                                      child: Text("Apply"))
-                                                ],
+                                                                        .refresh();
+                                                                    context
+                                                                        .read<
+                                                                            BookmarksCubit>()
+                                                                        .clearFilters();
+                                                                    Navigator.pop(
+                                                                        context);
+                                                                  },
+                                                                  child: const Row(
+                                                                      children: [
+                                                                        Text(
+                                                                            "Clear"),
+                                                                        Icon(Icons
+                                                                            .clear),
+                                                                      ])),
+                                                              TextButton(
+                                                                  onPressed:
+                                                                      () {
+                                                                    context
+                                                                        .read<
+                                                                            BookmarksCubit>()
+                                                                        .refresh();
+                                                                    context
+                                                                        .read<
+                                                                            BookmarksCubit>()
+                                                                        .filterByLabel();
+                                                                    Navigator.pop(
+                                                                        context);
+                                                                  },
+                                                                  child: const Row(
+                                                                      children: [
+                                                                        Text(
+                                                                            "Apply"),
+                                                                        Icon(Icons
+                                                                            .filter_alt_outlined),
+                                                                      ]))
+                                                            ],
+                                                          )
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  );
+                                                },
                                               ),
                                             );
-                                          },
-                                        ),
-                                      );
-                                    });
-                              },
-                              icon: Icon(Icons.filter_list)),
-                        )
-                      ],
-                    )
-                  ],
-                )
+                                          });
+                                    },
+                                    icon: const Icon(Icons.filter_list)),
+                              )
+                            ],
+                          )
+                        ],
+                      )
               ],
             ),
           ),

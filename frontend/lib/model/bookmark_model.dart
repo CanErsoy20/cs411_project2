@@ -1,11 +1,20 @@
+import 'logo_response_model.dart';
+
 class Bookmark {
   int? bookmarkId;
   int? userId;
   String? name;
   String? url;
   String? label;
+  LogoResponse? logo;
 
-  Bookmark({this.bookmarkId, this.userId, this.name, this.url, this.label});
+  Bookmark(
+      {this.bookmarkId,
+      this.userId,
+      this.name,
+      this.url,
+      this.label,
+      this.logo});
 
   Bookmark.fromJson(Map<String, dynamic> json) {
     bookmarkId = json['bookmarkId'];

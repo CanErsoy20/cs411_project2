@@ -37,6 +37,21 @@ class BookmarksCubit extends Cubit<BookmarksState> {
 
   List<String> labels = [];
 
+  Future<void> getLogos() async {
+    emit(BookmarksLoading());
+    for (var element in myBookmarkItems) {
+      if (element.type == "B") {
+        final response = await service.getLogo(element.url!);
+        if (response == null) {
+          element.logo = null;
+        } else {
+          element.logo = response;
+        }
+      }
+    }
+    emit(BookmarksDisplay());
+  }
+
   Future<void> getMyLabels() async {
     emit(BookmarksLoading());
     final response = await service.getMyLabels();
@@ -62,6 +77,7 @@ class BookmarksCubit extends Cubit<BookmarksState> {
           title: "Error", description: "Could not get bookmarks"));
     } else {
       myBookmarkItems = response;
+      await getLogos();
       temp = myBookmarkItems;
       emit(BookmarksDisplay());
     }
@@ -183,14 +199,19 @@ class BookmarksCubit extends Cubit<BookmarksState> {
     assignFolderLabelController.clear();
   }
 
+  clearFilters() {
+    selectedFilters.clear();
+    temp = myBookmarkItems;
+    emit(BookmarksDisplay());
+  }
+
   // Search and Filter methods
   void searchBookmark(String query) {
     if (query.isNotEmpty) {
       temp = myBookmarkItems
-          .where((element) =>
-              element.name!.toLowerCase().contains(query.toLowerCase()))
+          .expand((element) => element.searchByName(query))
+          .toSet()
           .toList();
-      filterByLabel();
       emit(BookmarksDisplay());
     } else {
       temp = myBookmarkItems;
@@ -214,9 +235,9 @@ class BookmarksCubit extends Cubit<BookmarksState> {
       temp = myBookmarkItems;
     } else {
       temp = myBookmarkItems
-          .where((element) => selectedFilters.contains(element.label))
+          .expand((element) => element.filterByLabel(selectedFilters))
+          .toSet()
           .toList();
     }
-    emit(BookmarksDisplay());
   }
 }

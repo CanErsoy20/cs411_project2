@@ -10,4 +10,5 @@ class ApiConstants {
   static const String deleteFolder = "folder/";
   static const String getUserItems = "user/get-items/";
   static const String getUserLabels = "bookmark/item/labels/";
+  static const String getLogo = "https://api.brandfetch.io/v2/brands/";
 }
