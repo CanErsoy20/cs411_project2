@@ -58,10 +58,9 @@ class BookmarkItemModel {
   List<BookmarkItemModel> searchByName(String query) {
     List<BookmarkItemModel> result = [];
 
-    if ((url?.toLowerCase().contains(query.toLowerCase()) ??
-        false ||
-            name!.toLowerCase().contains(query.toLowerCase()) ||
-            label!.toLowerCase().contains(query.toLowerCase()))) {
+    if (((url?.toLowerCase().contains(query.toLowerCase()) ?? false) ||
+        name!.toLowerCase().contains(query.toLowerCase()) ||
+        label!.toLowerCase().contains(query.toLowerCase()))) {
       result.add(this);
     }
 
