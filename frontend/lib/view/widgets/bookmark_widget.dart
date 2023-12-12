@@ -39,6 +39,9 @@ class BookmarkWidget extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.fromLTRB(5, 0, 5, 0),
           child: InkWell(
+            onTap: () {
+              context.read<BookmarksCubit>().goWebsite(bookmark.url!);
+            },
             onLongPress: () {
               showDialog(
                   context: context,

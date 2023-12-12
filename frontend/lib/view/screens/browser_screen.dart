@@ -48,6 +48,9 @@ class _BrowserScreenState extends State<BrowserScreen>
       },
       builder: (context, state) {
         return Scaffold(
+          body: Center(
+            child: Text(context.read<BookmarksCubit>().currentUrl),
+          ),
           appBar: AppBar(
             toolbarHeight: 100,
             centerTitle: true,
@@ -74,10 +77,15 @@ class _BrowserScreenState extends State<BrowserScreen>
                           color: Colors.grey[100],
                         ),
                         height: 50,
-                        child: const Padding(
-                          padding: EdgeInsets.all(8.0),
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
                           child: TextField(
-                            decoration: InputDecoration(
+                            controller:
+                                context.read<BookmarksCubit>().urlController,
+                            onSubmitted: (value) {
+                              context.read<BookmarksCubit>().goWebsite(value);
+                            },
+                            decoration: const InputDecoration(
                               border: InputBorder.none,
                               hintText: "Type a URL",
                             ),

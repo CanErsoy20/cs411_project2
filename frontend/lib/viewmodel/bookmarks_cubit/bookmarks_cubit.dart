@@ -15,6 +15,7 @@ class BookmarksCubit extends Cubit<BookmarksState> {
   BookmarksCubit(this.service) : super(BookmarksInitial());
   BookmarkService service;
   TextEditingController searchBookmarkController = TextEditingController();
+  TextEditingController urlController = TextEditingController();
 
   TextEditingController addBookmarkNameController = TextEditingController();
   TextEditingController addBookmarkURLController = TextEditingController();
@@ -36,6 +37,15 @@ class BookmarksCubit extends Cubit<BookmarksState> {
   List<String> selectedFilters = [];
 
   List<String> labels = [];
+
+  String currentUrl = "";
+
+  void goWebsite(String value) {
+    emit(BookmarksChecking());
+    currentUrl = value;
+    urlController.text = value;
+    emit(BookmarksDisplay());
+  }
 
   Future<void> getLogos() async {
     emit(BookmarksLoading());
@@ -199,17 +209,11 @@ class BookmarksCubit extends Cubit<BookmarksState> {
     assignFolderLabelController.clear();
   }
 
-  clearFilters() {
-    selectedFilters.clear();
-    temp = myBookmarkItems;
-    emit(BookmarksDisplay());
-  }
-
   // Search and Filter methods
   void searchBookmark(String query) {
     if (query.isNotEmpty) {
       temp = myBookmarkItems
-          .expand((element) => element.searchByName(query))
+          .expand((element) => element.search(query))
           .toSet()
           .toList();
       emit(BookmarksDisplay());
@@ -217,6 +221,12 @@ class BookmarksCubit extends Cubit<BookmarksState> {
       temp = myBookmarkItems;
       emit(BookmarksDisplay());
     }
+  }
+
+  clearFilters() {
+    selectedFilters.clear();
+    temp = myBookmarkItems;
+    emit(BookmarksDisplay());
   }
 
   void clearSearch() {
