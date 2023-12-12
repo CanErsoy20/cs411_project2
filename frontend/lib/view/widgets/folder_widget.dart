@@ -5,20 +5,32 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../viewmodel/bookmarks_cubit/bookmarks_cubit.dart';
+import 'dialog_with_tabs.dart';
 
-class FolderWidget extends StatelessWidget {
-  FolderWidget(
+class FolderWidget extends StatefulWidget {
+  const FolderWidget(
       {super.key,
       required this.bookmarks,
       required this.folderName,
       required this.folderId});
   final List<BookmarkItemModel> bookmarks;
-  final GlobalKey<FormState> assignBookmarkFormKey = GlobalKey<FormState>();
   final String folderName;
   final int folderId;
+
+  @override
+  State<FolderWidget> createState() => _FolderWidgetState();
+}
+
+class _FolderWidgetState extends State<FolderWidget>
+    with TickerProviderStateMixin {
+  final GlobalKey<FormState> assignBookmarkFormKey = GlobalKey<FormState>();
+
+  final GlobalKey<FormState> assignFolderFormKey = GlobalKey<FormState>();
+
   @override
   Widget build(BuildContext context) {
-    List<PopupMenuItem> items = bookmarks
+    TabController addTabController = TabController(length: 2, vsync: this);
+    List<PopupMenuItem> items = widget.bookmarks
         .map((bookmark) => PopupMenuItem(
               child: (bookmark.type! == "F")
                   ? FolderWidget(
@@ -43,93 +55,221 @@ class FolderWidget extends StatelessWidget {
           value: 3,
           child: TextButton(
             child: const Row(
-                children: [Icon(Icons.add), Text("Add New Bookmark")]),
+                children: [Icon(Icons.add), Text("Add new bookmark/folder")]),
             onPressed: () {
               showDialog(
                   context: context,
                   builder: (context) {
-                    return AlertDialog(
-                      title: const Text("Add New Bookmark"),
-                      content: Form(
-                        key: assignBookmarkFormKey,
-                        child: SingleChildScrollView(
-                          child: Column(
-                            children: [
-                              TextFormField(
-                                decoration: const InputDecoration(
-                                  border: OutlineInputBorder(),
-                                  labelText: 'Bookmark Name',
-                                ),
-                                controller: context
-                                    .read<BookmarksCubit>()
-                                    .assignBookmarkNameController,
-                                validator: (value) {
-                                  if (value == null || value.isEmpty) {
-                                    return "Bookmark name cannot be empty";
-                                  }
-                                  return null;
-                                },
+                    return DialogWithTabs(
+                      onPressed: () {
+                        if (addTabController.index == 0 &&
+                            assignBookmarkFormKey.currentState!.validate()) {
+                          context
+                              .read<BookmarksCubit>()
+                              .assignBookmark(widget.folderId);
+                        } else if (addTabController.index == 1 &&
+                            assignFolderFormKey.currentState!.validate()) {
+                          context
+                              .read<BookmarksCubit>()
+                              .assignFolder(widget.folderId);
+                        }
+                      },
+                      tabController: addTabController,
+                      tabs: const [
+                        Tab(text: "Bookmark"),
+                        Tab(
+                          text: "Folder",
+                        )
+                      ],
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Form(
+                            key: assignBookmarkFormKey,
+                            child: SingleChildScrollView(
+                              child: Column(
+                                children: [
+                                  TextFormField(
+                                    decoration: const InputDecoration(
+                                      border: OutlineInputBorder(),
+                                      labelText: 'Bookmark Name',
+                                    ),
+                                    controller: context
+                                        .read<BookmarksCubit>()
+                                        .assignBookmarkNameController,
+                                    validator: (value) {
+                                      if (value == null || value.isEmpty) {
+                                        return "Bookmark name cannot be empty";
+                                      }
+                                      return null;
+                                    },
+                                  ),
+                                  const SizedBox(height: 10),
+                                  TextFormField(
+                                      decoration: const InputDecoration(
+                                        border: OutlineInputBorder(),
+                                        labelText: 'Bookmark URL',
+                                      ),
+                                      controller: context
+                                          .read<BookmarksCubit>()
+                                          .assignBookmarkURLController,
+                                      validator: (value) {
+                                        if (value == null || value.isEmpty) {
+                                          return "Bookmark URL cannot be empty";
+                                        }
+                                        return null;
+                                      }),
+                                  const SizedBox(height: 10),
+                                  TextFormField(
+                                      decoration: const InputDecoration(
+                                        border: OutlineInputBorder(),
+                                        labelText: 'Bookmark Label',
+                                      ),
+                                      controller: context
+                                          .read<BookmarksCubit>()
+                                          .assignBookmarkLabelController,
+                                      validator: (value) {
+                                        if (value == null || value.isEmpty) {
+                                          return "Bookmark label cannot be empty";
+                                        }
+                                        return null;
+                                      }),
+                                ],
                               ),
-                              const SizedBox(height: 10),
-                              TextFormField(
-                                  decoration: const InputDecoration(
-                                    border: OutlineInputBorder(),
-                                    labelText: 'Bookmark URL',
-                                  ),
-                                  controller: context
-                                      .read<BookmarksCubit>()
-                                      .assignBookmarkURLController,
-                                  validator: (value) {
-                                    if (value == null || value.isEmpty) {
-                                      return "Bookmark URL cannot be empty";
-                                    }
-                                    return null;
-                                  }),
-                              const SizedBox(height: 10),
-                              TextFormField(
-                                  decoration: const InputDecoration(
-                                    border: OutlineInputBorder(),
-                                    labelText: 'Bookmark Label',
-                                  ),
-                                  controller: context
-                                      .read<BookmarksCubit>()
-                                      .assignBookmarkLabelController,
-                                  validator: (value) {
-                                    if (value == null || value.isEmpty) {
-                                      return "Bookmark label cannot be empty";
-                                    }
-                                    return null;
-                                  }),
-                            ],
+                            ),
                           ),
                         ),
-                      ),
-                      actions: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            TextButton(
-                              onPressed: () {
-                                Navigator.pop(context);
-                              },
-                              child: const Text("Cancel"),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Form(
+                            key: assignFolderFormKey,
+                            child: SingleChildScrollView(
+                              child: Column(
+                                children: [
+                                  TextFormField(
+                                      decoration: const InputDecoration(
+                                        border: OutlineInputBorder(),
+                                        labelText: 'Folder Name',
+                                      ),
+                                      controller: context
+                                          .read<BookmarksCubit>()
+                                          .assignFolderNameController,
+                                      validator: (value) {
+                                        if (value == null || value.isEmpty) {
+                                          return "Folder name cannot be empty";
+                                        }
+                                        return null;
+                                      }),
+                                  const SizedBox(height: 10),
+                                  TextFormField(
+                                    decoration: const InputDecoration(
+                                      border: OutlineInputBorder(),
+                                      labelText: 'Folder Label',
+                                    ),
+                                    controller: context
+                                        .read<BookmarksCubit>()
+                                        .assignFolderLabelController,
+                                    validator: (value) {
+                                      if (value == null || value.isEmpty) {
+                                        return "Folder label cannot be empty";
+                                      }
+                                      return null;
+                                    },
+                                  ),
+                                ],
+                              ),
                             ),
-                            TextButton(
-                              onPressed: () {
-                                if (assignBookmarkFormKey.currentState!
-                                    .validate()) {
-                                  context
-                                      .read<BookmarksCubit>()
-                                      .assignBookmark(folderId);
-                                }
-                              },
-                              child: const Text("Add"),
-                            ),
-                          ],
-                        )
+                          ),
+                        ),
                       ],
                     );
                   });
+
+              // showDialog(
+              //     context: context,
+              //     builder: (context) {
+              //       return AlertDialog(
+              //         title: const Text("Add New Bookmark"),
+              //         content: Form(
+              //           key: assignBookmarkFormKey,
+              //           child: SingleChildScrollView(
+              //             child: Column(
+              //               children: [
+              //                 TextFormField(
+              //                   decoration: const InputDecoration(
+              //                     border: OutlineInputBorder(),
+              //                     labelText: 'Bookmark Name',
+              //                   ),
+              //                   controller: context
+              //                       .read<BookmarksCubit>()
+              //                       .assignBookmarkNameController,
+              //                   validator: (value) {
+              //                     if (value == null || value.isEmpty) {
+              //                       return "Bookmark name cannot be empty";
+              //                     }
+              //                     return null;
+              //                   },
+              //                 ),
+              //                 const SizedBox(height: 10),
+              //                 TextFormField(
+              //                     decoration: const InputDecoration(
+              //                       border: OutlineInputBorder(),
+              //                       labelText: 'Bookmark URL',
+              //                     ),
+              //                     controller: context
+              //                         .read<BookmarksCubit>()
+              //                         .assignBookmarkURLController,
+              //                     validator: (value) {
+              //                       if (value == null || value.isEmpty) {
+              //                         return "Bookmark URL cannot be empty";
+              //                       }
+              //                       return null;
+              //                     }),
+              //                 const SizedBox(height: 10),
+              //                 TextFormField(
+              //                     decoration: const InputDecoration(
+              //                       border: OutlineInputBorder(),
+              //                       labelText: 'Bookmark Label',
+              //                     ),
+              //                     controller: context
+              //                         .read<BookmarksCubit>()
+              //                         .assignBookmarkLabelController,
+              //                     validator: (value) {
+              //                       if (value == null || value.isEmpty) {
+              //                         return "Bookmark label cannot be empty";
+              //                       }
+              //                       return null;
+              //                     }),
+              //               ],
+              //             ),
+              //           ),
+              //         ),
+              //         actions: [
+              //           Row(
+              //             mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              //             children: [
+              //               TextButton(
+              //                 onPressed: () {
+              //                   Navigator.pop(context);
+              //                 },
+              //                 child: const Text("Cancel"),
+              //               ),
+              //               TextButton(
+              //                 onPressed: () {
+              //                   if (assignBookmarkFormKey.currentState!
+              //                       .validate()) {
+              //                     context
+              //                         .read<BookmarksCubit>()
+              //                         .assignBookmark(folderId);
+              //                   }
+              //                 },
+              //                 child: const Text("Add"),
+              //               ),
+              //             ],
+              //           )
+              //         ],
+              //       );
+              //     });
             },
           )),
     );
@@ -141,7 +281,7 @@ class FolderWidget extends StatelessWidget {
                   builder: (context) {
                     return AlertDialog(
                       title: Text(
-                          "Are you sure you want to delete folder \"$folderName\"?"),
+                          "Are you sure you want to delete folder \"${widget.folderName}\"?"),
                       actions: [
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -157,7 +297,7 @@ class FolderWidget extends StatelessWidget {
                               onPressed: () {
                                 context
                                     .read<BookmarksCubit>()
-                                    .deleteFolder(folderId);
+                                    .deleteFolder(widget.folderId);
                                 Navigator.pop(context);
                               },
                               child: const Text("Yes, delete please",
@@ -190,7 +330,7 @@ class FolderWidget extends StatelessWidget {
                 color: Colors.grey,
               ),
               const SizedBox(width: 5),
-              Text(folderName ?? "Error"),
+              Text(widget.folderName),
             ],
           ),
         ),

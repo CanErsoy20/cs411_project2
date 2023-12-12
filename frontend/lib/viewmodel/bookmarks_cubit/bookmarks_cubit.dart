@@ -1,12 +1,13 @@
 import 'package:bloc/bloc.dart';
-import 'package:cs411_project2/model/assing_bookmark_model.dart';
+import 'package:cs411_project2/model/assign_bookmark_model.dart';
 import 'package:cs411_project2/model/bookmark_item_model.dart';
 import 'package:cs411_project2/model/new_bookmark_model.dart';
 import 'package:cs411_project2/model/new_folder_model.dart';
 import 'package:cs411_project2/model/user/user_info.dart';
 import 'package:cs411_project2/services/bookmark_service.dart';
 import 'package:flutter/material.dart';
-import '../../model/filter_model.dart';
+
+import '../../model/assign_folder_model.dart';
 
 part 'bookmarks_state.dart';
 
@@ -26,6 +27,9 @@ class BookmarksCubit extends Cubit<BookmarksState> {
   TextEditingController assignBookmarkURLController = TextEditingController();
   TextEditingController assignBookmarkLabelController = TextEditingController();
 
+  TextEditingController assignFolderNameController = TextEditingController();
+  TextEditingController assignFolderLabelController = TextEditingController();
+
   List<BookmarkItemModel> myBookmarkItems = [];
   List<BookmarkItemModel> temp = [];
 
@@ -39,7 +43,11 @@ class BookmarksCubit extends Cubit<BookmarksState> {
     if (response == null) {
       emit(BookmarksError(title: "Error", description: "Could not get labels"));
     } else {
-      labels.addAll(response);
+      for (var element in response) {
+        if (!labels.contains(element)) {
+          labels.add(element);
+        }
+      }
       emit(BookmarksDisplay());
     }
   }
@@ -109,7 +117,27 @@ class BookmarksCubit extends Cubit<BookmarksState> {
     if (response == null) {
       emit(BookmarksError(title: "Error", description: ""));
     } else {
-      emit(BookmarksSuccess(title: "Success", description: ""));
+      emit(BookmarksSuccess(
+          title: "Successful!",
+          description: "${newModel.name} assigned successfully}"));
+      getMyBookmarks();
+    }
+  }
+
+  Future<void> assignFolder(int folderId) async {
+    emit(BookmarksLoading());
+    AssignFolderModel newModel = AssignFolderModel(
+        name: assignFolderNameController.text,
+        label: assignFolderLabelController.text,
+        type: "F");
+    final response = await service.assignFolder(newModel, folderId);
+    if (response == null) {
+      emit(BookmarksError(
+          title: "Error", description: "Folder cannot be assigned"));
+    } else {
+      emit(BookmarksSuccess(
+          title: "Successful!",
+          description: "${newModel.name} assigned successfully"));
       getMyBookmarks();
     }
   }
@@ -118,9 +146,11 @@ class BookmarksCubit extends Cubit<BookmarksState> {
     emit(BookmarksLoading());
     final response = await service.deleteFolder(id);
     if (response == null) {
-      emit(BookmarksError(title: "Error", description: ""));
+      emit(BookmarksError(
+          title: "Error", description: "Could not delete folder"));
     } else {
-      emit(BookmarksSuccess(title: "Success", description: ""));
+      emit(BookmarksSuccess(
+          title: "Successful!", description: "Folder deleted successfully"));
       getMyBookmarks();
     }
   }
@@ -129,9 +159,11 @@ class BookmarksCubit extends Cubit<BookmarksState> {
     emit(BookmarksLoading());
     final response = await service.deleteBookmark(id);
     if (response == null) {
-      emit(BookmarksError(title: "Error", description: ""));
+      emit(BookmarksError(
+          title: "Error", description: "Could not delete bookmark"));
     } else {
-      emit(BookmarksSuccess(title: "Success", description: ""));
+      emit(BookmarksSuccess(
+          title: "Successful!", description: "Bookmark deleted successfully"));
       getMyBookmarks();
     }
   }
@@ -147,16 +179,18 @@ class BookmarksCubit extends Cubit<BookmarksState> {
     assignBookmarkNameController.clear();
     assignBookmarkURLController.clear();
     assignBookmarkLabelController.clear();
+    assignFolderNameController.clear();
+    assignFolderLabelController.clear();
   }
 
   // Search and Filter methods
   void searchBookmark(String query) {
-    filterByLabel();
     if (query.isNotEmpty) {
       temp = myBookmarkItems
           .where((element) =>
               element.name!.toLowerCase().contains(query.toLowerCase()))
           .toList();
+      filterByLabel();
       emit(BookmarksDisplay());
     } else {
       temp = myBookmarkItems;

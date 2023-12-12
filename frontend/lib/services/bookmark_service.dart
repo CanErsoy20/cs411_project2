@@ -1,6 +1,7 @@
 import 'dart:convert';
 
-import 'package:cs411_project2/model/assing_bookmark_model.dart';
+import 'package:cs411_project2/model/assign_bookmark_model.dart';
+import 'package:cs411_project2/model/assign_folder_model.dart';
 import 'package:cs411_project2/model/bookmark_item_model.dart';
 import 'package:cs411_project2/model/new_bookmark_model.dart';
 import 'package:cs411_project2/model/new_folder_model.dart';
@@ -81,6 +82,26 @@ class BookmarkService {
         dynamic body = json.decode(response.body);
         ResponseModel responseModel = ResponseModel.fromJson(body);
         return NewFolderModel.fromJson(responseModel.data);
+      } else {
+        return null;
+      }
+    } catch (e) {
+      return null;
+    }
+  }
+
+  Future<dynamic> assignFolder(
+      AssignFolderModel newFolderModel, int folderId) async {
+    try {
+      Response? response;
+      response = await Api.instance.postRequest(
+          ApiConstants.baseUrl,
+          "${ApiConstants.assignFolder}$folderId",
+          jsonEncode(newFolderModel.toJson()));
+      if (response.statusCode == 200) {
+        dynamic body = json.decode(response.body);
+        ResponseModel responseModel = ResponseModel.fromJson(body);
+        return responseModel.data;
       } else {
         return null;
       }
