@@ -12,6 +12,27 @@ import 'package:http/http.dart';
 import '../constants/api_constants.dart';
 
 class BookmarkService {
+  Future<List<String>?> getMyLabels() async {
+    try {
+      Response? response;
+      response = await Api.instance.getRequest(ApiConstants.baseUrl,
+          "${ApiConstants.getUserLabels}${UserInfo.loggedUser!.userId!}");
+      if (response.statusCode == 200) {
+        dynamic body = json.decode(response.body);
+        ResponseModel responseModel = ResponseModel.fromJson(body);
+        List<String> labels = [];
+        responseModel.data.forEach((element) {
+          labels.add(element);
+        });
+        return labels;
+      } else {
+        return null;
+      }
+    } catch (e) {
+      return null;
+    }
+  }
+
   Future<List<BookmarkItemModel>?> getMyBookmarks() async {
     try {
       Response? response;

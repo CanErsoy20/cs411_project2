@@ -6,9 +6,6 @@ import 'package:cs411_project2/model/new_folder_model.dart';
 import 'package:cs411_project2/model/user/user_info.dart';
 import 'package:cs411_project2/services/bookmark_service.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart';
-
-import '../../model/bookmark_model.dart';
 import '../../model/filter_model.dart';
 
 part 'bookmarks_state.dart';
@@ -31,18 +28,31 @@ class BookmarksCubit extends Cubit<BookmarksState> {
 
   List<BookmarkItemModel> myBookmarkItems = [];
   List<BookmarkItemModel> temp = [];
+
+  List<String> labels = ["Folder", "Bookmark"];
+
   List<PopupMenuItem> filters = [];
-  List<Filter> filterList = [
-    Filter("Social Media", false),
-    Filter("Research", false),
-    Filter("Shopping", false),
-    Filter("News", false),
-  ];
+  List<Filter> filterList = [];
+
+  Future<void> getMyLabels() async {
+    emit(BookmarksLoading());
+    final response = await service.getMyLabels();
+    if (response == null) {
+      emit(BookmarksError(title: "Error", description: "Could not get labels"));
+    } else {
+      labels.addAll(response);
+
+      filterList.addAll(labels.map((e) => Filter(e, false)).toList());
+      setFilters();
+      emit(BookmarksDisplay());
+    }
+  }
 
   // Bookmark Methods
   Future<void> getMyBookmarks() async {
     emit(BookmarksLoading());
     final response = await service.getMyBookmarks();
+    getMyLabels();
     if (response == null) {
       emit(BookmarksError(
           title: "Error", description: "Could not get bookmarks"));
@@ -168,6 +178,7 @@ class BookmarksCubit extends Cubit<BookmarksState> {
                   value: filter.value,
                   onChanged: (value) {
                     changeFilter(filter.title!, value ?? false);
+                    filterByLabel();
                   })),
         )
         .toList();
@@ -187,6 +198,15 @@ class BookmarksCubit extends Cubit<BookmarksState> {
 
   void refresh() {
     emit(BookmarksChecking());
+    emit(BookmarksDisplay());
+  }
+
+  void filterByLabel() {
+    temp = temp
+        .where((element) => filterList
+            .firstWhere((filter) => filter.title == element.label)
+            .value!)
+        .toList();
     emit(BookmarksDisplay());
   }
 }

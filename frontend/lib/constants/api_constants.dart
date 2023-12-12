@@ -9,4 +9,5 @@ class ApiConstants {
   static const String deleteBookmark = "bookmark/";
   static const String deleteFolder = "folder/";
   static const String getUserItems = "user/get-items/";
+  static const String getUserLabels = "bookmark/item/labels/";
 }
