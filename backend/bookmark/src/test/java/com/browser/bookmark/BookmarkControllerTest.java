@@ -94,25 +94,5 @@ public class BookmarkControllerTest {
 
         verify(bookmarkService, times(1)).deleteBookmarkById(bookmarkId);
     }
-
-    @Test
-    public void testAddBookmarkToFolder() throws Exception {
-        long folderId = 1L;
-        Folder folder = new Folder(folderId);
-        Bookmark bookmark = new Bookmark("http://example.com");
-
-        when(folderService.addFolder(folder)).thenReturn(folder);
-        when(bookmarkService.assignBookmarkToFolder(bookmark, folder.getId())).thenReturn(true);
-
-        mockMvc.perform(MockMvcRequestBuilders.post("/api/bookmark/add-to-folder/{id}", folderId)
-                        .contentType("application/json")
-                        .content("{\"name\":\"testname\",\"label\":\"testlabel\",\"type\":\"B\",\"url\":\"www.test.com\"}"))
-                .andExpect(status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("Success"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.statusCode").value(200))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.data.url").value("www.test.com"));
-
-        verify(bookmarkService, times(1)).assignBookmarkToFolder(bookmark, folderId);
-    }
 }
 

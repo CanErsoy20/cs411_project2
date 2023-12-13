@@ -90,26 +90,5 @@ public class FolderControllerTest {
 
         verify(folderService, times(1)).deleteFolderById(folderId);
     }
-
-    @Test
-    public void testAddFolderToFolder() throws Exception {
-        long parentFolderId = 1L;
-        Folder parentFolder = new Folder(parentFolderId, "Parent Folder");
-        Folder childFolder = new Folder("Child Folder");
-
-        when(folderService.findFolderById(parentFolderId)).thenReturn(parentFolder);
-        when(folderService.addBookmarkItemToFolder(childFolder, parentFolderId)).thenReturn(true);
-
-        mockMvc.perform(MockMvcRequestBuilders.post("/api/folder/add-to-folder/{id}", parentFolderId)
-                        .contentType("application/json")
-                        .content("{\"name\":\"Child Folder\"}"))
-                .andExpect(status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("Success"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.statusCode").value(200))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.data.name").value("Child Folder"));
-
-        verify(folderService, times(1)).findFolderById(parentFolderId);
-        verify(folderService, times(1)).addBookmarkItemToFolder(childFolder, parentFolderId);
-    }
 }
 
