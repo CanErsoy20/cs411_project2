@@ -385,7 +385,7 @@ class _BrowserScreenState extends State<BrowserScreen>
                                                 label: bookmark.label,
                                                 name: bookmark.name,
                                                 url: bookmark.url,
-                                                logo: bookmark.logo!));
+                                                logo: bookmark.logo));
                                       }
                                     }).toList()
                                   : [],
