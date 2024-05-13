@@ -88,4 +88,28 @@ public class BookmarkItemController {
             return new Response("Exception", 500, null);
         }
     }
+
+    @CrossOrigin(origins = "*")
+    @GetMapping
+    public Response getSomeBookmarkItems(@RequestParam("label") String label) {
+        try {
+            List<BookmarkItem> items = bookmarkItemService.findBookmarks(label);
+            return new Response("Success", 200, items);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new Response("Exception", 500, null);
+        }
+    }
+
+    @CrossOrigin(origins = "*")
+    @GetMapping
+    public Response getSomeFolders() {
+        try {
+            List<BookmarkItem> items = bookmarkItemService.findFolders();
+            return new Response("Success", 200, items);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new Response("Exception", 500, null);
+        }
+    }
 }
